@@ -1,0 +1,53 @@
+
+
+
+		<span ng-hide="JsonData[index].editingProjectName" ng-click="startEditing(JsonData[index],'projectName')">{{JsonData[index].PID}}
+		</span>
+			
+		<form ng-submit="doneEditing(JsonData[index],'projectName')" ng-show="JsonData[index].editingProjectName">
+			<input ng-blur="doneEditing(JsonData[index],'projectName')" ng-focus="JsonData[index]==editedProjectName" ng-model="JsonData[index].PID" class="input-large">
+		</form>
+		
+		<input type="checkbox" ng-model="JsonData[index].completed">
+		
+		
+		<p>Task Name : 
+			<span ng-hide="JsonData[index].editingTaskName" ng-click="startEditing(JsonData[index],'taskName')">{{JsonData[index].TN}}
+			</span>
+			
+			<form style="float:right;" ng-submit="doneEditing(JsonData[index],'taskName')" ng-show="JsonData[index].editingTaskName">
+				<input ng-blur="doneEditing(JsonData[index],'taskName')" ng-focus="JsonData[index]==editedTaskName" ng-model="JsonData[index].TN" class="input-large">
+			</form>
+		</p>		
+	</div>
+
+	<!-- Something Fishy here, try commenting out Description and watch how Comments comes back into picture -->
+	<!-- Description -->
+	<div class="row" style="background-color:#E3E3E3;height:230px;border-bottom:1px solid #A4A4A4;border-top:1px solid #A4A4A4;padding:4px;overflow:hidden;color:blue;">
+		<input type="text" style="width:95%;" ng-model="JsonData[index].TD">
+		<!-- Tags -->
+		<div style="width:95%;height:35px;background-color:red;">
+			<p style="float:left;">Tags<span style="font-size:8px;">(click on * to delete)</span> : </p>
+			
+			<div ng-repeat="tag in JsonData[index].tags" style="margin-left:4px;float:left;height:32px;width:35px;background-color:white;">
+				{{tag}}-<div ng-click="removeTag(index,tag)" style="color:red;cursor:pointer;">*</div>
+			</div>
+			Add Tag
+			<form ng-submit="addTag(index)">
+				<input type="text" style="width:60px;" ng-model="newTag">
+			</form>
+			
+		</div>
+		<!-- Followers -->
+		<div style="width:95%;height:35px;background-color:red;">
+			<p style="float:left;">followers : </p>
+			
+			<div ng-repeat="follower in JsonData[index].fol" style="margin-left:4px;float:left;height:32px;width:35px;background-color:white;">
+				{{follower}}
+			</div>
+		</div>
+	</div>
+	
+	
+	
+</div>

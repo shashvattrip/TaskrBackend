@@ -1,0 +1,10 @@
+<!-- Inbox -->
+<div ng-controller="InboxCtrl" ng-repeat="mail in AllEmails" class=" century"style="width:100%;border-bottom: 1px solid #d1d1d1;padding-bottom:0px;height:35px">
+	<p class="mail" style="margin-left:15px"><strong>{{mail.from}}</strong></p>
+	<p class="mail" style="margin-left:25px">{{mail.subject}}</p>
+	<img class="mail" src="images/frwd.png" style="opacity:0.8;float:right;margin-right:25px;margin-top:4px">
+	<img class="mail" src="images/reply.png" style="opacity:0.8;float:right;margin-top:4px;margin-right:10px;">
+	<img class="mail" src="images/open.png" style="opacity:0.8;float:right;margin-right:10px;">
+	<p class="mail" style="float:right;margin-right:25px">{{mail.date}}</p>
+
+</div>

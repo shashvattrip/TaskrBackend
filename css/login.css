@@ -1,0 +1,126 @@
+.section {
+    margin:0px;
+    bottom:0px;
+    width:1600px;
+    float:left;
+    height:100%;
+    text-align:center;
+}
+.login-form, .signup-form, .forgot-pwd {
+    background:#fff;
+    border-radius: 4px;
+    padding:30px;
+    text-align:center;
+    float:left;
+    margin:5em 40em;
+}
+.login-form, .forgot-pwd {
+    width:350px;
+}
+.signup-form {
+    width:600px;
+}
+
+
+.form-wrapper-01 {
+    margin: 0;
+    padding: 10px 0;
+}
+.form-wrapper-01 .inputbox {
+    border: 1px solid #eaedf2;
+    border-radius:3px;
+    height: 20px;
+    padding: 10px 0 10px 32px;
+    width: 44%;
+    outline:none;
+    margin-bottom:10px;
+    font-family: inherit;
+}
+.login-form .form-wrapper-01 .inputbox {
+    width:88%;
+}
+.form-wrapper-01 .name {
+    background:#eaedf2 url(../images/user.png) 10px 10px no-repeat;
+}
+.form-wrapper-01 .email {
+    background:#eaedf2 url(../images/email.png) 10px 10px no-repeat;
+}
+.form-wrapper-01 .password {
+    background:#eaedf2 url(../images/pass.png) 12px 10px no-repeat;
+}
+.form-wrapper-01 a.button {
+    text-decoration: none !important;
+    background: none repeat scroll 0 0 #77D28E;
+    border: none;
+    border-radius: 4px 4px 4px 4px;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px 20px;
+}
+.form-wrapper-01 .button:hover {
+    background:#259542;
+}#259542
+.form-wrapper-01 a.button > i {
+    font-size:20px;
+}
+
+Style for Social Buttons
+
+/*Social Button Styling*/
+.social {
+    text-decoration: none !important;
+    margin: 40px 0 10px;
+}
+.social a {
+    color:#fff;
+    text-decoration:none;
+    font-weight:bold;
+    border-radius: 4px 4px 4px 4px;
+    padding:20px 0;
+}
+.social a.facebook {
+    text-decoration: none !important;
+    background:#3b5998;
+}
+.social a.facebook:hover {
+    text-decoration: none !important;
+    background:#37528c;
+}
+.social .twitter {
+    background:#1daee3;
+    margin: 0 26px;
+}
+.social .twitter:hover {
+    background:#1ca4d6;
+}
+.social .google {
+    background:#d34836;
+}
+.social .google:hover {
+    background:#c74534;
+}
+.social .facebook > i, .social .twitter > i, .social .google > i {
+    border-radius: 4px 0 0 4px;
+    bottom: 3px;
+    font-size: 38px;
+    padding: 10px 14px;
+    position: relative;
+    vertical-align: middle;
+    clear: both;
+}
+.social .facebook > span, .social .twitter > span, .social .google > span {
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    padding:24px 20px 24px 0;
+}
+::selection {
+  background:#77D28E; 
+  color:#fff/* Safari */
+  }
+::-moz-selection {
+  background: #77D28E; 
+  color:#fff/* Firefox */
+}
