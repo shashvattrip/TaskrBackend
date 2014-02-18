@@ -89,12 +89,11 @@
 
         public function InsertTask($name,$desc)
         {
-            echo $name;
-            echo $desc;
+            
 
             include 'connect_db.php';
 
-            echo "Lag gayi tattiii";
+            
             //header('Content-Type: application/json; charset=utf-8');
         
             $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','','','','')";
@@ -102,7 +101,7 @@
             if(mysqli_query($con,$sql))
                 {
                     $str['Status']=TRUE;
-                    echo "Mui Mui";
+                    
                     echo json_encode($str);                                
                     
                 }

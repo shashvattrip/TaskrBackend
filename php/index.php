@@ -135,7 +135,7 @@
 								case 'tasks' :
 									$obj = new TaskAPI();
 
-									$obj->InsertTask($_POST['naam'],$_POST['description']);
+									$obj->InsertTask($_POST['name'],$_POST['description']);
 
 									break;
 
