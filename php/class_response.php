@@ -79,7 +79,7 @@
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in deleting task';  
                     exit(json_encode($str));  
                 }
             
@@ -91,8 +91,10 @@
         {
             echo $name;
             echo $desc;
+
             include 'connect_db.php';
-            
+
+            echo "Lag gayi tattiii";
             //header('Content-Type: application/json; charset=utf-8');
         
             $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','','','','')";
@@ -108,7 +110,7 @@
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in inserting task';  
                     exit(json_encode($str));
                 }
             
@@ -135,7 +137,7 @@
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in updating task';  
                     exit(json_encode($str));
                 }
             
@@ -202,7 +204,7 @@
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in deleting comment';  
                     exit(json_encode($str));
                 }
             
@@ -230,7 +232,7 @@
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in updating comment';  
                     exit(json_encode($str));
                 }
             
@@ -257,7 +259,7 @@
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in inserting comment';  
                     exit(json_encode($str));   
                 }
             
@@ -324,7 +326,7 @@ class TagAPI
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in deleting tag';  
                     exit(json_encode($str));  
                 }
             
@@ -355,7 +357,7 @@ class TagAPI
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in inserting tag';  
                     exit(json_encode($str));   
                 }
             
@@ -386,7 +388,7 @@ class TagAPI
             else 
                 {
                     $str['Status']=FALSE;
-                    $str['error']='SQL Error';  
+                    $str['error']='SQL Error in updating tag';  
                     exit(json_encode($str));
                 }
             

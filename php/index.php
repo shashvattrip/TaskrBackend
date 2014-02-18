@@ -71,7 +71,7 @@
 
 					else if($method== 'POST')
 					{
-						if($operation = 'delete')	
+						if($operation == 'delete')	
 						{
 							switch($type)
 							{
@@ -100,7 +100,7 @@
 						}
 						
 
-						else if($operation = 'update')	
+						else if($operation =='update')	
 						{
 							switch($type)
 							{
@@ -128,7 +128,7 @@
 
 						}
 
-						else if($operation = 'insert')	
+						else if($operation == 'insert')	
 						{
 							switch($type)
 							{

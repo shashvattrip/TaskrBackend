@@ -13,13 +13,13 @@
 	{
 		$str['Status']= FALSE;
 		$str['error']=mysqli_connect_error();
-		//echo json_encode($str);
+		echo json_encode($str);
 	}
 	else
 	{
 		
 		$str['Status']= TRUE;
-		//echo "Kachraaaa";	
+		//echo "Connected";	
 		
 	}
 
