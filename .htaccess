@@ -1,2 +1,6 @@
-DirectoryIndex index3.php index.php3 messagebrd.pl index.html index.htm
-# disable directory browsing
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule api/(.*)$ /php/index.php?id=$1 [QSA,NC,L]
+</IfModule>
