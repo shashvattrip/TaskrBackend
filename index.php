@@ -8,7 +8,7 @@
 	<!--<script src="js/App/modules/keypress/keypress.js"></script> -->
 	<script src="js/App/angular-animate.min.js"></script>
 	<script type="text/javascript" src="js/App/angular-route.js"></script>
-
+	<script type="text/javascript" src="js/App/angular-resource.min.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.css">
@@ -240,7 +240,8 @@
 				
 					<input ng-model="newTeamMember" type="text" class="input-medium century" style="color:#989898;margin-left:24px;margin-top:9px;background-color:#ffffff;border:0px solid #ffffff;" placeholder="enter team mate's email id"  >
 					
-					<button ng-click="addPeopleToProject()"style="margin-left:5px;margin-top:0px;border-radius:1px;font-size:12px"class="century btn btn-info">Add</button>
+					<button ng-click="fullCallAPI()"style="margin-left:5px;margin-top:0px;border-radius:1px;font-size:12px"class="century btn btn-info">Add</button>
+					<button ng-click="callRESTApi()">Test</button>
 			</div>
 
 			<div class="row" style="height:8px;width:100%;background-color:#e3e3e3;border-bottom:solid 1px #cbcbcb">

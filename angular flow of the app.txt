@@ -1,0 +1,7 @@
+1. Open taskr.com
+2. event onLoadMain() -> fetch data using REST
+	What data?
+		1. ProjectIDs
+		2. Project Names
+		3. Team Members of the Projects
+		4. 

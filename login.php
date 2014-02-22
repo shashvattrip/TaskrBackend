@@ -5,6 +5,8 @@
     {
         header('Location: index.html');
     }
+
+    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,6 +61,7 @@
                           <input name="password" class="inputbox password" style="color:#747474"type="password" placeholder="Password" />
                         <p style="padding-top:10px;">
                             <button type="submit">Login</button>
+                            <a href="redirectLinkedin.php"><img src="linkedinbtn.png"></a>
                         </p>
                     </form>
                         <p style="padding-top:10px">Forget password? It's ok. 

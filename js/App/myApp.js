@@ -4,7 +4,7 @@
 // Add Tags on Individual Tasks
 // Add Filter based on Tags
 
-var myapp=angular.module('myapp',['ngRoute','ui.router']);
+var myapp=angular.module('myapp',['ngRoute','ui.router','ngResource']);
 
 
 
@@ -31,11 +31,30 @@ myapp.directive('ngFocus', function( $timeout ) {
 
 
 
+myapp.factory('RESTAPI',function($resource)
+{
+    var BASE_API_URI='http://localhost/api/:table/:operation/?id=:id';
+    
+    return $resource(BASE_API_URI,
+            {
+                id:"@id",
+                table:"@table",
+                operation:"@operation"
+            },
+            {
+                List:{method:'GET',params:{id:'all',table:'tasks',operation:"view"},isArray:true},
+                getOne:{method:'GET',params:{id:'',table:'tasks',operation:'view'},isArray:true},
+                insert:{method:'POST',params:{table:'tasks',operation:'insert',id:''}},
+                update:{method:'POST',params:{id:'',table:'tasks',operation:'update'},isArray:false},
+                remove:{method:'POST',params:{id:'',table:'tasks',operation:'delete'}, isArray:false}
+
+            });
+});
 
 
 
 
-myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONData,GetTags,GetProjectIDs,GetMembers)
+myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONData,GetTags,GetProjectIDs,GetMembers,$resource,RESTAPI)
 {
     
     $scope.state=$stateParams;
@@ -44,11 +63,74 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     $scope.ListAllTags=GetTags;
     $scope.ListAllProjectIDs=GetProjectIDs;
     $scope.ListAllMembers=GetMembers;
-    $scope.test="Shashvat";
-    console.log(JSONData);
-    // $scope.sortOrder="TID";
-
     
+    console.log(JSONData);
+    
+    $scope.fullCallAPI=function()
+    {
+        //gets all the tags/tasks/comments in the table
+        RESTAPI.List().$promise.then(function(value)
+        {
+            console.log("Success");
+            //prints out array of tasks
+            value.forEach(function(data)
+            {
+                console.log('Task ID : ' + data.Task_ID);
+                console.log('Task Name : ' + data.Task_Name);
+            })
+        });
+        
+
+        // for fetching the details of one task/tag/comment
+        // var apiTaskID=1;
+        // apiResponse.getOne({id:apiTaskID}).$promise.then(function(value)
+        // {
+        //     console.log("Success");
+        //     console.log('Task ID : ' + value['0'].Task_ID);
+        //     console.log('Task Name : ' + value['0'].Task_Name);
+        // },function(errResponse)
+        // {
+        //     console.log(errResponse);
+        // });
+
+
+        // for inserting a new task/tag/comment
+        //Note the POST data sent for tags/comments/tasks are different!
+        // var apiName='Shashvat Rules';
+        // var apiDescription='Fuck Yeah!';
+        // apiResponse.insert({},{name:apiName}).$promise.then(function(value)
+        //     {
+        //         console.log("Succesasds123");
+        //     },function(errResponse)
+        //     {
+        //         console.log("Error");
+        //     });
+
+
+        // delete task/tag/comment
+        // apiResponse.remove({id:40}).$promise.then(function(value)
+        // {
+        //     console.log("Deleting!");
+        // },function(errResponse)
+        // {
+        //     console.log("Some error!");
+        // });
+
+        // update task/tag/comment
+
+        // var apiUpdate={id:41,name:"Shashvat123Rulz",description:"HOHOHO!!!"};
+
+        // RESTAPI.update(apiUpdate).$promise.then(function(value)
+        // {
+        //     console.log("success!");
+        // },function(errResponse)
+        // {
+        //     console.log("Somethig went wrong!");
+        // });
+
+
+    }
+
 
     $scope.getIndexOf=function(TID)
     {

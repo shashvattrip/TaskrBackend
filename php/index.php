@@ -27,8 +27,6 @@
 			echo "ID not assigned";
 		}
 
-
-
 		if($type=='tags' || $type=='comments' || $type=='tasks')
 		{
 			if($operation=='view'||$operation=='update'||$operation=='insert'||$operation=='delete')
@@ -77,22 +75,25 @@
 							{
 								case 'tasks' :
 									$obj = new TaskAPI();
-
-									$obj->DeleteTask($id);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->DeleteTask($objData->id);
 
 									break;
 
 								case 'comments':
 									$obj = new CommentAPI();
-
-									$obj->DeleteComment($id);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->DeleteComment($objData->id);
 
 									break;
 
 								case 'tags':
 									$obj = new TagAPI();
-
-									$obj->DeleteTag($id);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->DeleteTag($$objData->id);
 
 									break;
 
@@ -106,22 +107,25 @@
 							{
 								case 'tasks' :
 									$obj = new TaskAPI();
-
-									$obj->UpdateTask($id,$_POST['name'],$_POST['description']);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->UpdateTask($objData->id,$objData->name,$objData->description);
 
 									break;
 
 								case 'comments':
 									$obj = new CommentAPI();
-
-									$obj->UpdateComment($id,$_POST['body']);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->UpdateComment($objData->id,$objData->body);
 
 									break;
 
 								case 'tags':
 									$obj = new TagAPI();
-
-									$obj->UpdateTag($id,$_POST['name']);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->UpdateTag($objData->id,$objData->name);
 
 									break;
 							}
@@ -134,22 +138,25 @@
 							{
 								case 'tasks' :
 									$obj = new TaskAPI();
-
-									$obj->InsertTask($_POST['name'],$_POST['description']);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->InsertTask($objData->name,$objData->description);
 
 									break;
 
 								case 'comments':
 									$obj = new CommentAPI();
-
-									$obj->InsertComment($_POST['body']);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->InsertComment($objData->body);
 
 									break;
 
 								case 'tags':
 									$obj = new TagAPI();
-
-									$obj->InsertTag($_POST['name']);
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->InsertTag($objData->name);
 
 									break;
 							}
