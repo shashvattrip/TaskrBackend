@@ -1,7 +1,15 @@
 1. Open taskr.com
 2. event onLoadMain() -> fetch data using REST
 	What data?
-		1. ProjectIDs
-		2. Project Names
-		3. Team Members of the Projects
-		4. 
+		1. All the data
+3. manage the data with the $scope acquired from onLoadMain()
+4. on JSONDATA change, send POST request to the server
+	a)Every function that changes JSON will need to call RESTAPI.update()
+		I. Update $scope by calling onLoadMain()
+	b)Every function that removes JSON will need to call RESTAPI.remove()
+		I. Update $scope by calling onLoadMain()
+	c)Every Function that adds to JSON will need to call RESPAPI.create()
+		I. Update $scope by calling onLoadMain()
+
+
+

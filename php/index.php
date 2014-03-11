@@ -8,7 +8,6 @@
 
 		//echo $x;
 		// /api/task/op/:id
-
 		$path = ltrim($_SERVER['REQUEST_URI'], '/'); // Trim leading slash(es) 
 		
 		$elements = explode('/', $path);
@@ -24,7 +23,7 @@
 		}
 		else
 		{
-			echo "ID not assigned";
+			// echo "ID not assigned";
 		}
 
 		if($type=='tags' || $type=='comments' || $type=='tasks')
@@ -99,9 +98,8 @@
 
 							}
 						}
-						
 
-						else if($operation =='update')	
+						else if($operation == 'update')	
 						{
 							switch($type)
 							{
@@ -109,7 +107,8 @@
 									$obj = new TaskAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->UpdateTask($objData->id,$objData->name,$objData->description);
+									
+									$obj->UpdateTask($objData);
 
 									break;
 
@@ -117,7 +116,7 @@
 									$obj = new CommentAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->UpdateComment($objData->id,$objData->body);
+									$obj->UpdateComment($objData);
 
 									break;
 
@@ -125,7 +124,7 @@
 									$obj = new TagAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->UpdateTag($objData->id,$objData->name);
+									$obj->UpdateTag($objData);
 
 									break;
 							}
@@ -140,7 +139,7 @@
 									$obj = new TaskAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->InsertTask($objData->name,$objData->description);
+									$obj->InsertTask($objData->TN,$objData->TD);
 
 									break;
 
@@ -148,7 +147,7 @@
 									$obj = new CommentAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->InsertComment($objData->body);
+									$obj->InsertComment($objData);
 
 									break;
 
@@ -156,7 +155,7 @@
 									$obj = new TagAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->InsertTag($objData->name);
+									$obj->InsertTag($objData);
 
 									break;
 							}

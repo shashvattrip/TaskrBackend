@@ -1,5 +1,5 @@
 <!-- individual taskNew -->
-<div id="nav1" id="TaskRow{{task.TID}}" ng-repeat="task in JsonData | filter:SearchString | orderBy:sortOrder | filter:{PID:routePID}" class="row IndividualTaskRow">
+<div id="nav1" id="TaskRow{{task.TID}}" ng-repeat="task in JsonData | filter:SearchString | orderBy:sortOrder | filter:{PID:routePID} track by $index" class="row IndividualTaskRow">
 	
 	<div class="century IndividualTaskRowTID">
 		{{task.TID}}

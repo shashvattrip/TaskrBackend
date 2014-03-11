@@ -13,7 +13,7 @@
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.css">
 	<script type="text/javascript" src="js/App/modules/bootstrap-datepicker.js"></script>
-	
+	<script type="text/javascript" src="js/App/modules/keypress/keypress.js"></script>
 	
 	
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -458,7 +458,7 @@ One can also set priorities and due dates to communicate what's important, what'
 	        
 	    </div>      
 	    <div class="modal-body century" style="color:#747474">  
-	        <iframe width="500" height="282" style="margin-left:15px;border:3px"src="//www.youtube.com/embed/t22j9_S-OAc" frameborder="1" theme="light" enablejsapi="1" fs=0></iframe> 
+	        <!-- <iframe width="500" height="282" style="margin-left:15px;border:3px"src="//www.youtube.com/embed/t22j9_S-OAc" frameborder="1" theme="light" enablejsapi="1" fs=0></iframe>  -->
 	    </div>  
 	</div>
 

@@ -52,8 +52,6 @@ myapp.factory('RESTAPI',function($resource)
 });
 
 
-
-
 myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONData,GetTags,GetProjectIDs,GetMembers,$resource,RESTAPI)
 {
     
@@ -63,27 +61,38 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     $scope.ListAllTags=GetTags;
     $scope.ListAllProjectIDs=GetProjectIDs;
     $scope.ListAllMembers=GetMembers;
+
+
+    $scope.testing=function()
+    {
+        console.log("Testing Function");
+    }
+    //this should NOT come from JSONData
+    //this should come from RESTfulAPI
+    var tasksLocal = $scope.JsonData=JSONData;
     
-    console.log(JSONData);
+    // console.log(JSONData);
     
     $scope.fullCallAPI=function()
     {
         //gets all the tags/tasks/comments in the table
-        RESTAPI.List().$promise.then(function(value)
-        {
-            console.log("Success");
-            //prints out array of tasks
-            value.forEach(function(data)
-            {
-                console.log('Task ID : ' + data.Task_ID);
-                console.log('Task Name : ' + data.Task_Name);
-            })
-        });
+        //************this works************
+        // RESTAPI.List().$promise.then(function(value)
+        // {
+        //     console.log("Success");
+        //     //prints out array of tasks
+        //     value.forEach(function(data)
+        //     {
+        //         console.log('Task ID : ' + data.Task_ID);
+        //         console.log('Task Name : ' + data.Task_Name);
+        //     })
+        // });
         
 
         // for fetching the details of one task/tag/comment
-        // var apiTaskID=1;
-        // apiResponse.getOne({id:apiTaskID}).$promise.then(function(value)
+        //******************this works********************
+        // var apiTaskID=2;
+        // RESTAPI.getOne({id:apiTaskID}).$promise.then(function(value)
         // {
         //     console.log("Success");
         //     console.log('Task ID : ' + value['0'].Task_ID);
@@ -95,12 +104,17 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
 
         // for inserting a new task/tag/comment
-        //Note the POST data sent for tags/comments/tasks are different!
-        // var apiName='Shashvat Rules';
-        // var apiDescription='Fuck Yeah!';
-        // apiResponse.insert({},{name:apiName}).$promise.then(function(value)
+        // Note the POST data sent for tags/comments/tasks are different!
+        //**********************this works****************
+        // var objTemp={
+        //     "name":"Shashvat Rules - kickass",
+        //     "description":"shashvat kicks ass",
+        //     "skills":"football"
+        // }
+        // var tableName="tasks";
+        // RESTAPI.insert({table:tableName},objTemp).$promise.then(function(value)
         //     {
-        //         console.log("Succesasds123");
+        //         console.log("Success");
         //     },function(errResponse)
         //     {
         //         console.log("Error");
@@ -108,7 +122,9 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
 
         // delete task/tag/comment
-        // apiResponse.remove({id:40}).$promise.then(function(value)
+        //*******************this works***************
+        // var tableName="tasks";
+        // RESTAPI.remove({table:tableName},{id:43}).$promise.then(function(value)
         // {
         //     console.log("Deleting!");
         // },function(errResponse)
@@ -116,19 +132,126 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         //     console.log("Some error!");
         // });
 
+
         // update task/tag/comment
-
-        // var apiUpdate={id:41,name:"Shashvat123Rulz",description:"HOHOHO!!!"};
-
-        // RESTAPI.update(apiUpdate).$promise.then(function(value)
+        //*************************this works******************
+        // var apiUpdate={id:13,name:"Shashvat123Rulz",description:"HOHOHO!!!"};
+        // var commentUpdate={id:13,body:"Updated Comment Body"};
+        // var tableName="tasks";
+        // RESTAPI.update({table:tableName},commentUpdate).$promise.then(function(value)
         // {
         //     console.log("success!");
         // },function(errResponse)
         // {
         //     console.log("Somethig went wrong!");
         // });
+    }
 
 
+    $scope.insertTaskrREST=function(tableName,obj)
+    {
+        // for inserting a new task/tag/comment
+        // Note the POST data sent for tags/comments/tasks are different!
+        //for inserting tasks, obj will be of type task
+        //for inserting comment, obj will be of type Comment_Body
+        //for inserting tag, obj will be of type Tag_Name
+
+        console.log("in insertTaskrREST()");
+        // console.log(obj.TN+obj.TD);
+        RESTAPI.insert({table:tableName},obj).$promise.then(function(value)
+        {
+            //get the returned 'value'
+            console.log("Success");
+            // console.log("ID returned : " + value.Task_ID);
+            
+            if(tableName=="tasks")
+            {
+                //find the task with TID=-1
+                var tempIndex=$scope.getIndexOf(-1);
+                //add the TID to local JSONData
+                $scope.JsonData[tempIndex].TID=value.Task_ID;    
+            }
+            else if(tableName=="comments")
+            {
+                console.log(obj);
+                //set the obj.UserID to local Data
+                // _USERID=obj.userID;
+
+                //find the task the comment resides in
+                var tempIndex=$scope.getIndexOf(obj.Task_ID);
+                //append Comment_ID to the right comment
+                obj.Comment_ID=value.Comment_ID;
+                console.log("Inserting comment"+obj.Comment_ID);
+                //This Comment_ID should also be appended to the Tasks table in the column Comments(CSV)
+                // Call the update function for tasks
+                // RESTAPI.update();
+                $scope.JsonData[tempIndex].Comments.push(obj);
+            }
+            else if(tableName=="tags")
+            {
+                var tempIndex=$scope.getIndexOf(obj.Task_ID);
+                obj.Tag_ID=value.Tag_ID;
+
+                //update the Task 
+                // Call the update function for tasks
+                // $scope.updateTaskrREST("tasks",$scope.JsonData[tempIndex]);
+                $scope.JsonData[tempIndex].tags.push(obj);
+            }
+            else
+            {
+                console.log("Incorrect URL parameter to the TASKR-REST-API");
+            }
+            
+        },function(errResponse)
+        {
+            console.log("Error");
+        });
+    }
+
+    $scope.deleteTaskrREST=function(tableName,obj)
+    {
+        // Here obj is Task_ID / Tag_ID / Comment_ID
+        console.log("in deleteTaskrREST()");
+
+        RESTAPI.remove({table:tableName},{id:obj}).$promise.then(function(value)
+        {
+            console.log("Deleting!");
+        },function(errResponse)
+        {
+            console.log("Some error!");
+        });
+    }
+
+    $scope.updateTaskrREST=function(tableName,obj)
+    {
+        console.log("in updateTaskrREST()");
+        // obj may be task object or Tag_Name
+        
+        // console.log(obj);
+        RESTAPI.update({table:tableName},obj).$promise.then(function(value)
+        {
+            // console.log("success!");
+            if(tableName=="tasks")
+            {
+                console.log("Inside tasks update if-then-else");
+
+            }
+            else if(tableName=="comments")
+            {
+
+            }
+            else if(tableName=="tags")
+            {
+
+            }
+            else
+            {
+                console.log("Incorrect URL parameter to the TASKR-REST-API");
+            }
+        },function(errResponse)
+        {
+            console.log("Somethig went wrong!");
+        });
     }
 
 
@@ -155,11 +278,17 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     //Changes for every keystroke, it doesn't wait for the submit button to be pressed
     //Submit button is only to remove the input box and bring back the label
+    //************************************************************
+    /* .$watch is not a good function to use. Instead call RESTful API at every change to the $scope
+     .$watch function's functionality must be custom implemented. */
+    //************************************************************ 
+
     $scope.$watch('JsonData',function()
     {
         $scope.CountOfChangesInJsonData++;
         // console.log($scope.CountOfChangesInJsonData);
         PutJSONData($scope.JsonData);
+
         $scope.ListAllTags=GetTags;
     },true);
     
@@ -174,7 +303,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     {
         var currProject=$location.path();
         currProject=currProject.substring(1);
-        console.log(currProject);
+        // console.log(currProject);
         
         var arr=[];
         arr=currProject.split("/");
@@ -182,13 +311,13 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         // delimit at '/'
         if(currProject==='/' || currProject==='')
             currProject=0;
-        console.log(currProject);
+        // console.log(currProject);
         currProject=parseInt(currProject);
         return currProject;
     }
 
 
-    var tasksLocal = $scope.JsonData=JSONData;
+    
     $scope.addTask = function () 
     {
         var newTask = $scope.newTask.trim();
@@ -204,7 +333,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             occupiedTIDs.push($scope.JsonData[i].TID);
 
         var _TID;
-        console.log(occupiedTIDs);
+        // console.log(occupiedTIDs);
         for(var i=100;i>=0;i--)
             if(occupiedTIDs.indexOf(i)==-1)
             {
@@ -215,7 +344,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
         var currProject=$location.path();
         currProject=currProject.substring(1);
-        console.log(currProject);
+        // console.log(currProject);
         
         var arr=[];
         arr=currProject.split("/");
@@ -223,12 +352,12 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         // delimit at '/'
         if(currProject==='/' || currProject==='')
             currProject=0;
-        console.log(currProject);
+        // console.log(currProject);
         currProject=parseInt(currProject);
         $scope.JsonData.push(
         {
             "PID":currProject,
-            "TID":_TID,
+            "TID":-1,//This should not be sent to the server, but the server needs to return this on success so that it can be added to the localdata
             "TN":newTask,
             "TD":' Task Description ',
             "Comments":[],
@@ -241,6 +370,22 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             completed:false
         });
         
+        var tempData={
+            "PID":currProject,
+            "TID":-1,//This should not be sent to the server, but the server needs to return this on success so that it can be added to the localdata
+            "TN":newTask,
+            "TD":' Task Description ',
+            "Comments":[],
+            "fol":[],
+            "star":0,
+            "DueDate":"14-2-2014",
+            "tags":[],
+            "assignedTo":"Shashvat",
+            "assignedBy":"Shashvat",
+            completed:false
+        }
+
+        $scope.insertTaskrREST("tasks",tempData);
         $scope.newTask = '';
     };
 
@@ -262,13 +407,13 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         
         
         var tempPath='/'+$scope.routePID+'/task/'+task.TID;
-        console.log(tempPath);
+        // console.log(tempPath);
         $location.path(tempPath);
     };
 
     //Submit button is only to remove the input box and bring back the label
     // The $scope.JsonData gets updated for every keystroke in the input as the input box is ng-model="task.TN"
-    $scope.doneEditing = function (task, editWhat) 
+    $scope.doneEditing = function (task,editWhat) 
     {
         switch(editWhat)
         {
@@ -280,6 +425,8 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
                 {
                     $scope.removeTask(task);
                 }   
+
+                $scope.updateTaskrREST("tasks",task);
                 break;
             case "projectName":
                 task.editingProjectName=false;
@@ -299,6 +446,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     $scope.removeTask = function (task) 
     {
         tasksLocal.splice(tasksLocal.indexOf(task), 1);
+        $scope.deleteTaskrREST("tasks",task.TID);
     };
 
 
@@ -326,7 +474,18 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.addTag=function(task)
     {
-        task.tags.push($scope.newTag);
+        // check if duplicate
+        console.log("hoho");
+        if($scope.ListAllTags.indexOf($scope.newTag)>-1)    
+            return;
+        var tempTag={
+            "Tag_Name":$scope.newTag,
+            "Task_ID":task.TID
+        }
+        console.log("hoho123");
+        // add tag into the tag table
+        //the task gets update inside the RESTAPI.insert function of the tag
+        $scope.insertTaskrREST("tags",tempTag);
         $scope.newTag='';
         $scope.AdddingANewTag=0;
         // ListAllTags=GetTags;
@@ -337,7 +496,13 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     {
         var ind=$scope.JsonData[index].tags.indexOf(tag);
         if(ind>-1)
+        {
+            //update the task
+            $scope.updateTaskrREST("tasks",$scope.JsonData[index]);
+            //update locally
             $scope.JsonData[index].tags.splice(ind,1);
+        }
+            
     }
 
 
@@ -393,7 +558,15 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.addFollower=function(task)
     {
-        task.fol.push($scope.newFollower);
+        //check if the $scope.newFollower is a member of the project or not
+        //if not a member, display an alert to add a member who is on present on Taskr, and an option to invite him to taskr.
+        // return 
+
+        // else continue with the function
+        //update the task 
+        $scope.updateTaskrREST("tasks",task);
+        // task.fol.push($scope.newFollower);
+        
         $scope.AddingANewFollower=0;
         $scope.newFollower='';
     }
@@ -401,12 +574,14 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     $scope.removeFollower=function(task,follower)
     {
         task.fol.splice(task.fol.indexOf(follower),1);
+        //update the task
+        $scope.updateTaskrREST("tasks",task);
     }
 
     $scope.addAssignedTo=function(index)
     {
-        console.log("Passing index");
-        console.log(index);
+        // console.log("Passing index");
+        // console.log(index);
         if(!$scope.JsonData[index].assignedTo)
             $scope.JsonData[index].assignedTo="Shashvat";
         else 
@@ -491,26 +666,49 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         }
         console.log(task);
         console.log(task.Comments);
-        task.Comments.push(newComment);
+        var tempComment={
+            "Comment_Body":newComment,
+            "Task_ID":task.TID,
+            "UserID":1
+        };
+
+        // task.Comments.push(tempComment);
+        //insert into comment table
+        $scope.insertTaskrREST("comments",tempComment);
+        //update the
         $scope.comment='';
     }
 
     $scope.starTask=function(task)
     {
         if(task.star==1)
+        {
             task.star=0;
+            $scope.updateTaskrREST("tasks",task);
+        }
+            
         else
+        {
+            $scope.updateTaskrREST("tasks",task);
             task.star=1;
+        }
+            
         // console.log(task);
     }
 
     $scope.clockTask=function(task)
     {
         if(task.clocked==1)
+        {
+            $scope.updateTaskrREST("tasks",task);
             task.clocked=0;
+        }
+            
         else
+        {
+            $scope.updateTaskrREST("tasks",task);
             task.clocked=1;
-
+        }
     }
 
 
@@ -556,6 +754,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
             task.DueDate=str[2] + '-' + str[1] + '-' + str[3];
             console.log(task.DueDate);
+            $scope.updateTaskrREST("tasks",task);
             PutJSONData($scope.JsonData);
             // task.DueDate={
             //     "day":,"month":,"year":
@@ -683,8 +882,4 @@ myapp.config(function($stateProvider,$urlRouterProvider,$routeProvider)
                 }
                 
             })
-
-    
-
-
 });

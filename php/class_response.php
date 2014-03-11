@@ -6,27 +6,75 @@
         //This includes making a JSON of all the tables ie tasks,tags,comments and returning one JSON obj for a user
         public function LoadAllData()
         {
+            $count=mysqli_query($con,"SELECT COUNT(*) FROM Task_Info");
+
+            $index=0;
+            $tasksArray=array();
+            //fetch all the tasks and store in the array $task
+            while($index<$count)
+            {
+                $task = mysqli_query($con,"SELECT Task_ID, Task_Name, Task_Description, Task_Followers, Task_Tags
+                FROM Task_Info
+                WHERE Task_ID=$id");    
+                array_push($tasksArray, $task);
+            }
+
+            
+
             // follow this format for JSON
             // create this JSON and send it
             //this function will be called on PageLoad
+            //Load all tasks that a user has to-do
             // [
-            //     {"PID":100,
-            //     "TID":100,
-            //     "TN":"Study Red Black Trees",
-            //     "TD":"Upcoming Test on DSA",
-            //     "Comments":[],
-            //     "fol":["Saransh"],
+            //     {"project":
+            //          [    
+                        // {
+                        //     "Project_ID":100,
+                        //     "Project_Name":"Taskr",
+                        //     "Project_status":"active",
+                        //     "Project_Members":[UserID1,UserID2,UserID3],
+                        //     "Project_CreatedOn":"Date"
+                        // }
+            //          ],
+            //     "Task_ID":100,
+            //     "Task_Name":"Study Red Black Trees",
+            //     "Task_Description":"Upcoming Test on DSA",
+            //     "Comments":[
+            //        {"Comment_ID:21","Comment_Body":"Yay, this is a comment"},
+            //        {"Comment_ID:21","Comment_Body":"Yay, this is a comment"},
+            //        {"Comment_ID:21","Comment_Body":"Yay, this is a comment"}],
+            //     "followers":[UserID1,UserID2,UserID3],
             //     "star":1,
             //     "DueDate":"14-2-2014",
-            //     "tags":["DSA"],
-            //     "assignedTo":"Shashvat",
-            //     "assignedBy":"Shashvat",
+            //     "tags":[
+            //              {"Tag_ID1":222,"Tag_Name":"JS"},
+            //              {"Tag_ID1":222,"Tag_Name":"JS"},
+            //              {"Tag_ID1":222,"Tag_Name":"JS"}
+            //            ]
+            //     "assignedTo":["User_ID":123,"User_Name":"Shashvat"],
             //     "completed":true,
-            //     "ProjectName":"Academics",
             //     "clocked":1}
             // ]
 
 
+            // Structure of DATABASE
+            // ************* user_login ************
+            // User_ID | User_Name | User_Email | User_Type (Facebook/Custom) | User_LastLoggedIn | User_Contact | User_Password | User_CreatedDateTime
+
+            // ************* Tasks_Info ************
+            // Task_ID | Task_Name | Task_Description | Task_CreatedDateTime | Task_Followers(CSV) | Task_Tags(CSV) | Task_CreatedOn | Task_Completed | Task_Followers | Task_assignedTo | Task_Star | Task_CreatedBy
+
+            // ************* Tags_Info ************
+            // Tag_ID | Tag_Name | Tag_CreatedDateTime 
+
+            // ************* Comments_Info ************
+            // Comment_ID | Comment_Body | Comment_CreatedDateTime | User_ID | Comment_Task_ID(this points to the Task_ID in which this comment was made)
+
+            // ************* Projects_Info ************
+            // Project_ID | Project_Name | User_CreatedDateTime | Project_Description | Project_Members | Project_Status
+
+            // ************* User_Info ************
+            // User_ID | Task_IDs(CSV)
         }
     }
 
@@ -84,6 +132,8 @@
             //echo $id;
             header('Content-Type: application/json; charset=utf-8');
         
+            //This should not be a delete query
+            //change column Deleted to TRUE
             $sql = "DELETE FROM $TASK_TABLE WHERE Task_ID=$id";
                
             if(mysqli_query($con,$sql))
@@ -104,10 +154,14 @@
         {
             include 'connect_db.php';
             header('Content-Type: application/json; charset=utf-8');
-            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','','','','')";
+            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','','','','','','')";
+
             if(mysqli_query($con,$sql))
             {
+
                 $str['Status']=TRUE;
+                
+                $str['Task_ID']=mysqli_insert_id($con);
                 echo json_encode($str);                                
             }
             else 
@@ -119,11 +173,18 @@
             }
         }
 
-        public function UpdateTask($id,$name,$desc)
+        public function UpdateTask($objData)
         {
             include 'connect_db.php';
-            //header('Content-Type: application/json; charset=utf-8');
+            $name=$objData->TN;
+            $desc=$objData->TD;
+            $id=$objData->TID;
+            //append CommentID
+            // $newComment=$objData->
+
+            header('Content-Type: application/json; charset=utf-8');
             $sql = "UPDATE $TASK_TABLE SET Task_Name='$name',Task_Description='$desc' WHERE Task_ID=$id";
+            // echo json_encode($objData);
 
             if(mysqli_query($con,$sql))
             {
@@ -191,10 +252,13 @@
             }
         }
 
-        public function UpdateComment($id,$body)
+        public function UpdateComment($objData)
         {
+            //$objData will contain on Body
             include 'connect_db.php';
-            
+            // $id=$objData->CID;
+            $body=$objData->Body;
+
             header('Content-Type: application/json; charset=utf-8');
         
             $sql = "UPDATE $COMMENT_TABLE SET Comment_Body='$body' WHERE Comment_ID=$id";
@@ -213,20 +277,26 @@
             }
         }
 
-        public function InsertComment($body)
+        public function InsertComment($objData)
         {
-            include 'connect_db.php';
             
+            //$objData will contain only Body
+            $body=$objData->Comment_Body;
+            $userID=$objData->UserID;
+            $Comment_Task_ID=$objData->Task_ID;
+            // $dateCreatedOn=new Date();
+            // echo $body;
+            include 'connect_db.php';
+            //add new Date() to the data for comment createdon column
             header('Content-Type: application/json; charset=utf-8');
         
-            $sql = "INSERT INTO $COMMENT_TABLE VALUES('','$body')";
-               
+            $sql = "INSERT INTO $COMMENT_TABLE VALUES(NULL,'$body','','$userID','$Comment_Task_ID')";
             if(mysqli_query($con,$sql))
             {
                 $str['Status']=TRUE;
+                $str['Comment_ID']=mysqli_insert_id($con);
                 exit(json_encode($str));                                    
             }
-
             else 
             {
                 $str['Status']=FALSE;
@@ -291,17 +361,20 @@
             }
         }
 
-        public function InsertTag($name)
+        public function InsertTag($objData)
         {
             include 'connect_db.php';
-            
+            $name=$objData->Tag_Name;
             header('Content-Type: application/json; charset=utf-8');
-        
-            $sql = "INSERT INTO $TAG_TABLE VALUES('','$name')";
+            //add created on date value
+            // $date=new Date();
+
+            $sql = "INSERT INTO $TAG_TABLE VALUES(NULL,'$name','')";
                
             if(mysqli_query($con,$sql))
             {
                 $str['Status']=TRUE;
+                $str['Tag_ID']=mysqli_insert_id($con);
                 exit(json_encode($str));                                    
             }
 
