@@ -26,7 +26,21 @@
 			// echo "ID not assigned";
 		}
 
-		if($type=='tags' || $type=='comments' || $type=='tasks')
+
+		if($type=='GetAllData')
+		{
+			if($_SERVER['REQUEST_METHOD']=='GET')
+			{
+				// header('Content-Type: application/json; charset=utf-8');
+				include_once('allData.php');
+				// $str['Status']=TRUE;
+				// $str['Shashvat']="Shashvat";
+				// echo json_encode($str);
+				die();
+			}
+		}
+
+		if($type=='tags' || $type=='comments' || $type=='tasks' || $type=='projects' || $type=='user_login')
 		{
 			if($operation=='view'||$operation=='update'||$operation=='insert'||$operation=='delete')
 			{
@@ -127,6 +141,14 @@
 									$obj->UpdateTag($objData);
 
 									break;
+
+								case 'user_login':
+									$obj = new User_LoginAPI();
+									$data = file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->UpdateUser($objData);
+
+									break;
 							}
 
 						}
@@ -139,7 +161,7 @@
 									$obj = new TaskAPI();
 									$data = file_get_contents("php://input");
 									$objData=json_decode($data);
-									$obj->InsertTask($objData->TN,$objData->TD);
+									$obj->InsertTask($objData);
 
 									break;
 
@@ -158,6 +180,20 @@
 									$obj->InsertTag($objData);
 
 									break;
+
+								case 'projects':
+									$obj = new ProjectAPI();
+									$data=file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->insertProject($objData);
+									break;
+
+								// case 'user_login':
+								// 	$obj = new User_LoginAPI();
+								// 	$data=file_get_contents("php://input");
+								// 	$objData=json_decode($data);
+								// 	$obj->insertUserLogin
+
 							}
 						}
 					}	

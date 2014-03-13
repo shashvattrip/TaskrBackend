@@ -46,7 +46,9 @@ myapp.factory('RESTAPI',function($resource)
                 getOne:{method:'GET',params:{id:'',table:'tasks',operation:'view'},isArray:true},
                 insert:{method:'POST',params:{table:'tasks',operation:'insert',id:''}},
                 update:{method:'POST',params:{id:'',table:'tasks',operation:'update'},isArray:false},
-                remove:{method:'POST',params:{id:'',table:'tasks',operation:'delete'}, isArray:false}
+                remove:{method:'POST',params:{id:'',table:'tasks',operation:'delete'}, isArray:false},
+                getAllData:{method:'GET',params:{table:'GetAllData'},isArray:false},
+                addPeopleToProject:{method:'POST',params:{table:'addNewMember',operation:'insert',id:''},isArray:false}
 
             });
 });
@@ -56,37 +58,53 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 {
     
     $scope.state=$stateParams;
-    $scope.routeTID=$stateParams.TID;
-    $scope.routePID=$stateParams.PID;
+    $scope.routeTask_ID=$stateParams.Task_ID;
+    $scope.routePID=((($stateParams.PID==null) || ($stateParams.PID==0))?0:$stateParams.PID);
+    // console.log("RoutePID : " + $scope.routePID);
+    // $scope.query.Task_Project_ID=$scope.routePID;
     $scope.ListAllTags=GetTags;
-    $scope.ListAllProjectIDs=GetProjectIDs;
-    $scope.ListAllMembers=GetMembers;
+    // $scope.ListAllProjectIDs=GetProjectIDs;
+    // $scope.ListAllMembers=GetMembers;
 
+    // $scope.JsonData=JSONData;
 
     $scope.testing=function()
     {
-        console.log("Testing Function");
+        // console.log("Printing $scope.JsonData");
+        // console.log($scope.JsonData);
+        // var userLoginObj={
+        //     "User_ID":"1",
+        //     "Task_ID":"156",
+        //     "Project_ID":"47"
+        // };
+                
+        // console.log(userLoginObj);
+        // $scope.updateTaskrREST("user_login",userLoginObj);
     }
-    //this should NOT come from JSONData
-    //this should come from RESTfulAPI
-    var tasksLocal = $scope.JsonData=JSONData;
-    
-    // console.log(JSONData);
-    
+
     $scope.fullCallAPI=function()
     {
         //gets all the tags/tasks/comments in the table
         //************this works************
-        // RESTAPI.List().$promise.then(function(value)
-        // {
-        //     console.log("Success");
-        //     //prints out array of tasks
-        //     value.forEach(function(data)
-        //     {
-        //         console.log('Task ID : ' + data.Task_ID);
-        //         console.log('Task Name : ' + data.Task_Name);
-        //     })
-        // });
+        RESTAPI.getAllData({table:'GetAllData'}).$promise.then(function(value)
+        {
+            if(value.Status==false)
+            {
+                alert('fullCallAPI() received bad response!');
+            }
+            // console.log("Success");
+            $scope.UserInfo=value.User;
+            $scope.JsonData=value.allTasks;          
+            console.log("allTasks");
+            console.log($scope.JsonData);
+            $scope.ListAllProjects=value.Projects;
+            // console.log($scope.UserInfo);
+            console.log($scope.ListAllProjects);
+
+        },function(errResponse)
+        {
+            console.log(errResponse);
+        });
         
 
         // for fetching the details of one task/tag/comment
@@ -161,15 +179,40 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         RESTAPI.insert({table:tableName},obj).$promise.then(function(value)
         {
             //get the returned 'value'
-            console.log("Success");
-            // console.log("ID returned : " + value.Task_ID);
-            
+            // console.log("Success");
+           
             if(tableName=="tasks")
             {
-                //find the task with TID=-1
+                //find the task with Task_ID=-1
+                console.log("Value : ");
+                console.log(value);
+                console.log("ID returned : " + value.Task_ID);
+                console.log(obj);
                 var tempIndex=$scope.getIndexOf(-1);
-                //add the TID to local JSONData
-                $scope.JsonData[tempIndex].TID=value.Task_ID;    
+                // console.log(tempIndex);
+                //add the Task_ID to local JSONData
+                $scope.JsonData[tempIndex].Task_ID=value.Task_ID;    
+                console.log("New Task added : " + $scope.JsonData[tempIndex].Task_Name);
+
+                //update user_login table
+                //add the newly created Task into Task_IDs column and Project into Project_IDs column
+               
+                
+                console.log($scope.JsonData[tempIndex].Project_ID);
+                console.log("newlycreated");
+                console.log($scope.newlyCreatedProjectID_temp);
+                
+
+                var userLoginObj={
+                    "User_ID":$scope.UserInfo.User_ID,
+                    "Task_ID":value.Task_ID,
+                    // "Project_ID":$scope.JsonData[tempIndex].Project_ID
+                    "Project_ID":$scope.newlyCreatedProjectID_temp
+                };
+
+                console.log("userLoginObj for updating user_login")
+                console.log(userLoginObj);
+                $scope.updateTaskrREST("user_login",userLoginObj);
             }
             else if(tableName=="comments")
             {
@@ -195,7 +238,24 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
                 //update the Task 
                 // Call the update function for tasks
                 // $scope.updateTaskrREST("tasks",$scope.JsonData[tempIndex]);
-                $scope.JsonData[tempIndex].tags.push(obj);
+                $scope.JsonData[tempIndex].Tags.push(obj);
+            }
+            else if(tableName=="projects")
+            {
+                console.log(value);
+                var DBProjectID=value.Project_ID;
+                console.log("DBProjectID : ");
+                console.log(DBProjectID);
+                $scope.newlyCreatedProjectID_temp=DBProjectID;
+                var p={
+                    "Project_ID":DBProjectID,
+                    "Project_Name":obj.Project_Name
+                };
+                $scope.ListAllProjects.push(p);
+                $scope.addTaskbyAddingNewProject();
+                //update $scope.JsonData for Projects
+                // var tempIndex=$scope.getIndexOf()
+                // $scope.JsonData.Projects
             }
             else
             {
@@ -224,7 +284,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.updateTaskrREST=function(tableName,obj)
     {
-        console.log("in updateTaskrREST()");
+        // console.log("in updateTaskrREST()");
         // obj may be task object or Tag_Name
         
         // console.log(obj);
@@ -233,7 +293,8 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             // console.log("success!");
             if(tableName=="tasks")
             {
-                console.log("Inside tasks update if-then-else");
+                console.log("Updated Task");
+                console.log(value);
 
             }
             else if(tableName=="comments")
@@ -243,6 +304,10 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             else if(tableName=="tags")
             {
 
+            }
+            else if(tableName=="user_login")
+            {
+                console.log(value);
             }
             else
             {
@@ -255,15 +320,21 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     }
 
 
-    $scope.getIndexOf=function(TID)
+    $scope.getIndexOf=function(Task_ID)
     {
         for (var i = 0; i < $scope.JsonData.length; i++) 
         {
-            if($scope.JsonData[i].TID==TID)
+            // console.log($scope.JsonData[i]);
+            // console.log(Task_ID);
+            if($scope.JsonData[i].Task_ID==Task_ID)
+            {
+                console.log("FOUND tempIndex");
                 return i;
+            }
+                
         };
         
-        // return ($scope.JsonData.indexOf(TID));
+        // return ($scope.JsonData.indexOf(Task_ID));
     }
 
     //This PutJSONData function needs to be separate I think. But I don't know where to put it. Maybe in services? Will figure it out later
@@ -271,7 +342,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     {
         var STORAGE_ID='Stoopid';
         // console.log('In PutJSONData factory\n I am not sure whether a factory is used to update model');
-        localStorage.setItem(STORAGE_ID,JSON.stringify(DataToPut));
+        // localStorage.setItem(STORAGE_ID,JSON.stringify(DataToPut));
     };
 
     $scope.CountOfChangesInJsonData=0;
@@ -299,7 +370,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     $scope.editedProjectName=null;
 
 
-    $scope.getProjectID=function()
+    $scope.getProjectName=function()
     {
         var currProject=$location.path();
         currProject=currProject.substring(1);
@@ -309,10 +380,39 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         arr=currProject.split("/");
         currProject=arr[0];
         // delimit at '/'
-        if(currProject==='/' || currProject==='')
-            currProject=0;
+        if(currProject==='/' || currProject==='' || currProject=='0')
+        {
+            currProject='all my';
+            return currProject;
+        }
+            
+        // console.log("All Projects");
+        // console.log($scope.ListAllProjects);
+        if($scope.ListAllProjects)
+        {
+            console.log($scope.ListAllProjects.length);
+            for (var i = 0; i < $scope.ListAllProjects.length ; i++) 
+            {
+                if($scope.ListAllProjects[i].Project_ID==currProject)
+                {
+                    return $scope.ListAllProjects[i].Project_Name;
+                }
+            };
+        }
         // console.log(currProject);
-        currProject=parseInt(currProject);
+        // currProject=parseInt(currProject);
+        // console.log($scope.JsonData.length());
+        // for (var i = 0; i < $scope.JsonData.length; i++) 
+        // {
+        //     // console.log($scope.JsonData[i]);
+        //     // console.log(Task_ID);
+        //     if($scope.JsonData[i].Project_ID==currProject)
+        //     {
+        //         console.log("FOUND tempIndex");
+        //         return $scope.JsonData[i].Project_Name;
+        //     }
+                
+        // };   
         return currProject;
     }
 
@@ -326,25 +426,8 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             return;
         }
 
-        //Generate a TID which is not used by any other task
-        //This immitates the server's functionality to ensure unique TIDs
-        var occupiedTIDs = [];
-        for(var i=0;i<$scope.JsonData.length;i++)
-            occupiedTIDs.push($scope.JsonData[i].TID);
-
-        var _TID;
-        // console.log(occupiedTIDs);
-        for(var i=100;i>=0;i--)
-            if(occupiedTIDs.indexOf(i)==-1)
-            {
-                _TID=i;
-                break;
-            }
-            // console.log(i);
-
         var currProject=$location.path();
         currProject=currProject.substring(1);
-        // console.log(currProject);
         
         var arr=[];
         arr=currProject.split("/");
@@ -352,40 +435,33 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         // delimit at '/'
         if(currProject==='/' || currProject==='')
             currProject=0;
-        // console.log(currProject);
-        currProject=parseInt(currProject);
-        $scope.JsonData.push(
-        {
-            "PID":currProject,
-            "TID":-1,//This should not be sent to the server, but the server needs to return this on success so that it can be added to the localdata
-            "TN":newTask,
-            "TD":' Task Description ',
-            "Comments":[],
-            "fol":[],
-            "star":0,
-            "DueDate":"14-2-2014",
-            "tags":[],
-            "assignedTo":"Shashvat",
-            "assignedBy":"Shashvat",
-            completed:false
-        });
         
+        currProject=parseInt(currProject);
+        console.log(currProject);
+        
+
         var tempData={
-            "PID":currProject,
-            "TID":-1,//This should not be sent to the server, but the server needs to return this on success so that it can be added to the localdata
-            "TN":newTask,
-            "TD":' Task Description ',
+            
+            "Task_ID":"-1",//This should not be sent to the server, but the server needs to return this on success so that it can be added to the localdata
+            "Task_Name":newTask,
+            "Task_Description":' Task Description ',
+            "Task_Project_ID":currProject,
             "Comments":[],
-            "fol":[],
+            "Task_Followers":[],
             "star":0,
             "DueDate":"14-2-2014",
-            "tags":[],
+            "Tags":[],
             "assignedTo":"Shashvat",
             "assignedBy":"Shashvat",
-            completed:false
+            "completed":false
         }
-
+        // console.log(tempData);
+        $scope.JsonData.push(tempData);
+        //Add the task to Database
         $scope.insertTaskrREST("tasks",tempData);
+
+        //Update the Projects Table in the Database
+
         $scope.newTask = '';
     };
 
@@ -406,7 +482,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         }
         
         
-        var tempPath='/'+$scope.routePID+'/task/'+task.TID;
+        var tempPath='/'+$scope.routePID+'/task/'+task.Task_ID;
         // console.log(tempPath);
         $location.path(tempPath);
     };
@@ -419,9 +495,9 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         {
             case "taskName":
                 task.editingTaskName=false;
-                task.TN = task.TN.trim();
+                task.Task_Name = task.Task_Name.trim();
                 $scope.editedTaskName=null;
-                if (!task.TN) 
+                if (!task.Task_Name) 
                 {
                     $scope.removeTask(task);
                 }   
@@ -445,27 +521,28 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.removeTask = function (task) 
     {
-        tasksLocal.splice(tasksLocal.indexOf(task), 1);
-        $scope.deleteTaskrREST("tasks",task.TID);
+        // tasksLocal.splice(tasksLocal.indexOf(task), 1);
+        $scope.JsonData.splice($scope.JsonData.indexOf(task),1);
+        $scope.deleteTaskrREST("tasks",task.Task_ID);
     };
 
 
-    $scope.clearDoneTasks = function () 
-    {
-        $scope.JsonData = tasksLocal = tasksLocal.filter(function (val) 
-        {
-            return !val.completed;
-        });
-    };
+    // $scope.clearDoneTasks = function () 
+    // {
+    //     $scope.JsonData = tasksLocal.filter(function (val) 
+    //     {
+    //         return !val.completed;
+    //     });
+    // };
 
 
-    $scope.markAll = function (task) 
-    {
-        tasksLocal.forEach(function (task) 
-        {
-            tasksLocal.completed = done;
-        });
-    };
+    // $scope.markAll = function (task) 
+    // {
+    //     tasksLocal.forEach(function (task) 
+    //     {
+    //         tasksLocal.completed = done;
+    //     });
+    // };
 
     $scope.AddingANewTag=function()
     {
@@ -480,7 +557,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             return;
         var tempTag={
             "Tag_Name":$scope.newTag,
-            "Task_ID":task.TID
+            "Task_ID":task.Task_ID
         }
         console.log("hoho123");
         // add tag into the tag table
@@ -494,13 +571,14 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.removeTag=function(index,tag)
     {
-        var ind=$scope.JsonData[index].tags.indexOf(tag);
+        var ind=$scope.JsonData[index].Tags.indexOf(tag);
         if(ind>-1)
         {
+            //update locally
+            $scope.JsonData[index].Tags.splice(ind,1);
             //update the task
             $scope.updateTaskrREST("tasks",$scope.JsonData[index]);
-            //update locally
-            $scope.JsonData[index].tags.splice(ind,1);
+            
         }
             
     }
@@ -524,18 +602,18 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         return false;
     };
 
-    $scope.addPeopleToProject=function()
-    {
-        if(!$scope.newTeamMember)
-            return; 
-        else
-        {
-            //check if the team member is already present in ListAllMembers
-            console.log("here");
+    // $scope.addPeopleToProject=function()
+    // {
+    //     if(!$scope.newTeamMember)
+    //         return; 
+    //     else
+    //     {
+    //         //check if the team member is already present in ListAllMembers
+    //         console.log("here");
 
-            $scope.newTeamMember='';
-        }
-    }
+    //         $scope.newTeamMember='';
+    //     }
+    // }
 
     $scope.SetSelectedTags=function(tag)
     {
@@ -573,9 +651,10 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.removeFollower=function(task,follower)
     {
-        task.fol.splice(task.fol.indexOf(follower),1);
+        task.Task_Followers.splice(task.Task_Followers.indexOf(follower),1);
         //update the task
         $scope.updateTaskrREST("tasks",task);
+        
     }
 
     $scope.addAssignedTo=function(index)
@@ -594,66 +673,67 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         $scope.JsonData[index].assignedTo=null;
     }
 
-    $scope.newProject=function()
+    $scope.addTaskbyAddingNewProject=function()
     {
-        
-        //Generate a TID which is not used by any other task
-        //This immitates the server's functionality to ensure unique TIDs
-        var occupiedPIDs = [];
-        for(var i=0;i<$scope.JsonData.length;i++)
-            occupiedPIDs.push($scope.JsonData[i].PID);
-
-        var _PID;
-        console.log(occupiedPIDs);
-        
-        for(var i=100;i>=0;i--)
-            if(occupiedPIDs.indexOf(i)==-1)
-            {
-                _PID=i;
-                break;
-            }
-
-        var occupiedTIDs = [];
-        for(var i=0;i<$scope.JsonData.length;i++)
-            occupiedTIDs.push($scope.JsonData[i].TID);
-
-        var _TID;
-        
-        for(var i=100;i>=0;i--)
-            if(occupiedTIDs.indexOf(i)==-1)
-            {
-                _TID=i;
-                break;
-            }
-    
-        console.log("New PID");            
-        console.log(_PID);
-        console.log("New TID");            
-        console.log(_TID);
-        $scope.JsonData.push(
+        //insert a dummy task in that  project
+        if($scope.newlyCreatedProjectID_temp==null)
         {
-            "PID":_PID,
-            "TID":_TID,
-            "TN":"New Task",
-            "TD":' Task Description ',
-            // "TC":"Task Comments",
+            console.log("ProjectID Not created yet!");
+            return;
+        }
+        var tempData={
+            
+            "Task_ID":"-1",//This should not be sent to the server, but the server needs to return this on success so that it can be added to the localdata
+            "Task_Name":"New Task",
+            "Task_Description":' Task Description ',
+            "Task_Project_ID":$scope.newlyCreatedProjectID_temp,
             "Comments":[],
-            "fol":[],
+            "Task_Followers":[],
             "star":0,
-            "DueDate":"2013-1-24", 
-            "tags":[],
+            "DueDate":"14-2-2014",
+            "Tags":[],
             "assignedTo":"Shashvat",
             "assignedBy":"Shashvat",
-            completed:false
-        });
-        // console.log($location.path());
+            "completed":false
+        }
+        console.log(tempData);
+        $scope.JsonData.push(tempData);
+        //Add the task to Database
+        $scope.insertTaskrREST("tasks",tempData);
 
+    }
 
-        //Update Model
-        PutJSONData($scope.JsonData);
-        $scope.ListAllProjectIDs.push(_PID);
-        console.log("ListAllPIDs");
-        console.log($scope.ListAllProjectIDs);
+    $scope.newProject=function()
+    {
+        var newProject = $scope.newProjectName.trim();
+
+        if (!newProject.length) 
+        {
+            return;
+        }
+        var obj=
+        {
+            "Project_Name":newProject
+        }
+        console.log(obj);
+
+        //insert the new project into Project table
+        //Insert new dummy task - this is done inside $scope.insertTaskrREST("projects",obj)
+        //update user_login table
+        //add the newly created Task into Task_IDs column and Project into Project_IDs column
+        $scope.insertTaskrREST("projects",obj);
+        console.log("Is this executed?");
+        //yes it is
+
+        //close the modal box
+        $('#addAProject').modal('hide');
+        //change the url to '/'
+        $scope.closeAddProjectModalBox();    
+    }
+    $scope.closeAddProjectModalBox=function()
+    {
+        $location.path('/');
+        $scope.newProjectName='';
     }
 
     $scope.addComment=function(task)
@@ -668,7 +748,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         console.log(task.Comments);
         var tempComment={
             "Comment_Body":newComment,
-            "Task_ID":task.TID,
+            "Task_ID":task.Task_ID,
             "UserID":1
         };
 
@@ -770,6 +850,41 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         $location.path('/');
     }
 
+
+    $scope.addPeopleToProject=function()
+    {
+        console.log($scope.newTeamMember);
+
+        //If the user isn't on a project, the invitation will be sent out and the new team member will be added but not associated with any project
+
+        //Ensure that the user has selected a project
+
+        var obj={
+            "Project_ID":$scope.routePID,
+            "User_ID":$scope.UserInfo.User_ID,
+            "New_Member_Email":$scope.newTeamMember
+        };
+
+        $scope.newTeamMember='';
+        RESTAPI.addPeopleToProject({table:'addPeople'},obj).$promise.then(function(value)
+        {
+            console.log("Successfully sent pachage to server");
+            //value will contain
+            // obj=
+            // {
+            //     "User_ID":newMemberID,
+            //     "User_Name":newMemberName,
+            // }
+
+            //add this user to the right project
+
+        },function(errResponse)
+        {
+            console.log("Error while adding a new team member");
+        });
+        
+    }
+
     $scope.printTasks=function()
     {
         // var printCSS=new String('
@@ -869,7 +984,7 @@ myapp.config(function($stateProvider,$urlRouterProvider,$routeProvider)
         // .state('route1.task',
             .state('route1.task',
             {
-                url:"/task/:TID",
+                url:"/task/:Task_ID",
                 views:
                 {
                     // The @ suffix addresses the view in the higher state

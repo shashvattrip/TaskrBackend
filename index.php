@@ -14,8 +14,7 @@
 	<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.css">
 	<script type="text/javascript" src="js/App/modules/bootstrap-datepicker.js"></script>
 	<script type="text/javascript" src="js/App/modules/keypress/keypress.js"></script>
-	
-	
+	<script type="text/javascript">var id=1</script>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<!-- <link rel="stylesheet" type="text/css" href="css/animations.css"> -->
 </head>
@@ -110,7 +109,7 @@
 
 </style>
 
-<body id="BODYID" ng-controller="DataCtrl" style="overflow-y:hidden;">
+<body id="BODYID" ng-controller="DataCtrl" ng-init="fullCallAPI()" style="overflow-y:hidden;">
 	<!--
 	<script>
 	$(document).ready(function()
@@ -237,11 +236,13 @@
 						</div>
 					</div>
 
-				
-					<input ng-model="newTeamMember" type="text" class="input-medium century" style="color:#989898;margin-left:24px;margin-top:9px;background-color:#ffffff;border:0px solid #ffffff;" placeholder="enter team mate's email id"  >
+					<form ng-submit="addPeopleToProject()">
+						<input ng-model="newTeamMember" type="text" class="input-medium century" style="color:#989898;margin-left:24px;margin-top:9px;background-color:#ffffff;border:0px solid #ffffff;" placeholder="enter team mate's email id"  >
+					</form>
 					
-					<button ng-click="fullCallAPI()"style="margin-left:5px;margin-top:0px;border-radius:1px;font-size:12px"class="century btn btn-info">Add</button>
-					<button ng-click="callRESTApi()">Test</button>
+					
+					<button ng-click="addPeopleToProject()"style="margin-left:5px;margin-top:0px;border-radius:1px;font-size:12px"class="century btn btn-info">Add</button>
+					<!-- <button ng-click="testing()">Test</button> -->
 			</div>
 
 			<div class="row" style="height:8px;width:100%;background-color:#e3e3e3;border-bottom:solid 1px #cbcbcb">
@@ -275,17 +276,17 @@
 				
 				
 
-				<div id="nav1" class="project" ng-repeat="project in ListAllProjectIDs" ng-hide="project==0">
+				<div id="nav1" class="project" ng-repeat="project in ListAllProjects" ng-hide="project==0">
 					<img src="images/right.png" class="project_pic">
-					<a class="link" ng-href="#/{{project}}" style="color:#989898;font-size:14px">Project {{project}}</a><br>
+					<a class="link" ng-href="#/{{project.Project_ID}}" style="color:#989898;font-size:14px">{{project.Project_Name}}</a><br>
 				</div>
 
 			</div>
 			
 			<!-- add Project -->
 			<div id="nav1"class="row century addproject" >
-				<p style="cursor:pointer;color:#989898;font-size:16px;margin-left:40px;margin-top:4px" ng-click="newProject()">
-					add project <strong>+</strong>
+				<p style="cursor:pointer;color:#989898;font-size:16px;margin-left:40px;margin-top:4px" >
+					<a href="#addAProject" data-toggle="modal">add project <strong>+</strong></a>
 				</p>
 			</div>
 
@@ -317,7 +318,7 @@
 				</div>
 				
 				<div style="color:#747474;height:44px;line-height:44px;float:left;padding-left:10px;">
-					Project {{getProjectID()}}
+					{{getProjectName()}}
 				</div>
 
 				<div style="color:#747474;height:44px;line-height:44px;float:left;padding-left:10px;">
@@ -334,19 +335,20 @@
 			<div class="century container" style="width:586px;background-color:#E3E3E3;height:25px;border-bottom:1px solid #d1d1d1;">
 				<div id="nav1"class="mid">
 				    <select class="selectpicker span2 century sort" ng-model="sortOrder">
+					    <option value="" style="display:none;">Sort by</option>
 					    <option value="PID">By Project</option>
 					    <option value="DueDate">By Due Date</option>
-					    <option value="-completed">Status</option>
-					    <option value="TID">Task ID</option>
+					    <option value="completed">Status</option>
+					    <option value="Task_ID">Task ID</option>
 				  </select>
   				</div>
-
+<!-- 
 				<div id="nav1"class="mid">
 				    <select class="selectpicker span2 century sort"   name='Choose one of the following...'>
 					    <option selected="selected" disabled="disabled">filter</option>
 					    <option ng-repeat="tag in ListAllTags">{{tag}}</option>
 				  </select>
-  				</div>
+  				</div> -->
 			</div>
 
 			<!-- New Task Row -->
@@ -462,12 +464,27 @@ One can also set priorities and due dates to communicate what's important, what'
 	    </div>  
 	</div>
 
+
+	<!--Add A Project Modal-->
+	<div id="addAProject" class="modal century hide fade" style="display: none;">  
+	    <div class="modal-header" style="background-color:#77D28E">  
+	    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="float:right;color:#fff;opacity:1">&times;</button> 
+	        <h1 style="font-size:30px;margin-top:0px;margin-bottom:0px;color:#fff">Add A Project</h1>  
+	        
+	    </div>      
+	    <div class="modal-body century" style="color:#747474">  
+	        <form ng-submit="newProject()">
+	        	<input ng-model="newProjectName" type="text">
+	        	<p>press enter to create a new project</p>
+	        </form>
+	    </div>  
+	</div>
 	
 	
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/App/myApp.js"></script>
 	<script type="text/javascript" src="js/App/InboxCtrl.js"></script>
 	<script type="text/javascript" src="js/App/services/eventData.js"></script>
-
+	
 </body>
 </html>

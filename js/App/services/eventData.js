@@ -1,10 +1,11 @@
-myapp.factory('JSONData', function()
+myapp.factory('JSONData', function(RESTAPI)
 {
 	
 	// var STORAGE_ID='Taskr-JSON-Server';
 	var STORAGE_ID='Stoopid';
 	// console.log('new factory');
-	return JSON.parse(localStorage.getItem(STORAGE_ID) || '[]');
+	// return JSON.parse(localStorage.getItem(STORAGE_ID) || '[]');
+	return [];
 
 });
 
@@ -15,24 +16,24 @@ myapp.factory('GetTags',function(JSONData)
 {
 	var arrayTags=[];
 	var obj=JSONData;
-	obj.forEach(function(value)
-	{
-		// console.log(value.TID);
-		value.tags.forEach(function(value2)
-		{
-			var flag=0;
-			arrayTags.forEach(function(elem)
-			{
-				if(value2===elem)
-					flag=1;
-			});
-			if(flag===0)
-				arrayTags.push(value2);
-			// console.log(value2);
-		});
-	});
+	// obj.forEach(function(value)
+	// {
+	// 	// console.log(value.TID);
+	// 	value.tags.forEach(function(value2)
+	// 	{
+	// 		var flag=0;
+	// 		arrayTags.forEach(function(elem)
+	// 		{
+	// 			if(value2===elem)
+	// 				flag=1;
+	// 		});
+	// 		if(flag===0)
+	// 			arrayTags.push(value2);
+	// 		// console.log(value2);
+	// 	});
+	// });
 
-	return arrayTags;
+	return [];
 });
 
 
@@ -40,27 +41,27 @@ myapp.factory('GetMembers',function(JSONData)
 {
 	var arrayMembers=[];
 	var obj=JSONData;
-	obj.forEach(function(value)
-	{
-		// console.log(value.TID);
-		value.fol.forEach(function(value2)
-		{
-			var flag=0;
-			arrayMembers.forEach(function(elem)
-			{
-				if(value2===elem)
-				{
-					flag=1;
-					// break;
-				}	
-			});
-			if(flag===0)
-				arrayMembers.push(value2);
-			// console.log(value2);
-		});
-	});
+	// obj.forEach(function(value)
+	// {
+	// 	// console.log(value.TID);
+	// 	value.fol.forEach(function(value2)
+	// 	{
+	// 		var flag=0;
+	// 		arrayMembers.forEach(function(elem)
+	// 		{
+	// 			if(value2===elem)
+	// 			{
+	// 				flag=1;
+	// 				// break;
+	// 			}	
+	// 		});
+	// 		if(flag===0)
+	// 			arrayMembers.push(value2);
+	// 		// console.log(value2);
+	// 	});
+	// });
 
-	return arrayMembers;
+	return [];
 });
 
 

@@ -1,60 +1,137 @@
 <?php
-	include 'connect_db.php';
+	include_once 'connect_db.php';
     header('Content-Type: application/json; charset=utf-8');
 	$u_id= "1";//$_GET['id'];
 	
-	$data["User"] = mysqli_fetch_array(mysqli_query($con, "SELECT User_Name FROM $USER_TABLE WHERE User_ID = $u_id"),MYSQLI_ASSOC);
+	$errorHandling['errors'] = array();
+	$errorHandling['Status']=TRUE;
+
+	// fetch User_ID and User_Name
+	$data["User"] = mysqli_fetch_array(mysqli_query($con, "SELECT User_Name, User_ID FROM $USER_TABLE WHERE User_ID = $u_id"),MYSQLI_ASSOC);
 	
+	// fetch ProjectIDs
 	$p_ids = mysqli_query($con, "SELECT Project_IDs FROM $USER_TABLE WHERE User_ID = $u_id");
 
-	
-	//$finalArray=array($data);
-	$array = mysqli_fetch_array($p_ids, MYSQLI_ASSOC);
-
-	//echo $array['Project_IDs'][0];
-	//echo json_encode($array);
-	//echo $data;
-	// echo "string";
-	$string = $array['Project_IDs'];
-	//$string = implode(",", $array[0]['Project_IDs']);
-	// echo json_encode($string);
-	
-	$pid_loop=explode(',',$string);
-
-	//echo json_encode($pid_loop);
-	for($x=0;$x<count($pid_loop);$x++)
+	//in case no projects were found in the $USER_TABLE
+	if($p_ids===false)
 	{
-
-		$recor = mysqli_query($con,"SELECT Project_ID,Project_Name,Project_Description,Project_Members,Project_Status FROM $PROJECT_TABLE 
-		WHERE Project_ID=$pid_loop[$x]");
-
-		$projects = mysqli_fetch_array($recor, MYSQLI_ASSOC);
-
-		$data["Projects"][] = $projects;
-		//array_merge($data["Projects"],$projects);
+		$errorHandling['Status']=false;
+		array_push($errorHandling['errors'], "Some Error while retreiving ProjectIDs in alldata.php");
 	}
 
-		$reco = mysqli_query($con, "SELECT Task_IDs FROM $USER_TABLE WHERE User_ID = $u_id");
-		$t_ids = mysqli_fetch_array($reco, MYSQLI_ASSOC);
+	$array = mysqli_fetch_array($p_ids, MYSQLI_ASSOC);
+	// echo count($array['Project_IDs']);
+
+	if($array['Project_IDs']=="")
+	{
+		// unset($str);
+		$errorHandling['Status']=false;
+		array_push($errorHandling['errors'], "The user does not have any projects! Add Projects for the user!");
+		// echo json_encode($str);
+	}
+	
+
+	$string = $array['Project_IDs'];
+	$pid_loop=explode(',',$string);
+
+	// echo json_encode($pid_loop);
+	// if there are no projects then $pid_loop will be = [""] and hence
+	// $pid_loop[0]=""	
+	
+	for($x=0; ( $x<count($pid_loop) && $pid_loop[0]!="" );$x++)
+	{
+
+		$record = mysqli_query($con,"SELECT Project_ID,Project_Name,Project_Description,Project_Members,Project_Status FROM $PROJECT_TABLE 
+		WHERE Project_ID=$pid_loop[$x]");
+
+		if($record===FALSE)
+		{
+			array_push($errorHandling['errors'], "Error in retreiving pids in the $pid_loop");
+			$errorHandling['Status']=FALSE;
+		}
+		else
+		{
+			$projects = mysqli_fetch_array($record, MYSQLI_ASSOC);
+			$data["Projects"][] = $projects;
+			//array_merge($data["Projects"],$projects);
+		}
+	}
+
+		unset($record);
+		
+		$record = mysqli_query($con, "SELECT Task_IDs FROM $USER_TABLE WHERE User_ID = $u_id");
+		$t_ids = mysqli_fetch_array($record, MYSQLI_ASSOC);
+
 		// $data = array_map("str_getcsv", preg_split('/\r*\n+|\r+/', $c)); // for separating the csv values and storing them in array	
 		$id_loop=explode(',',$t_ids['Task_IDs']); // for separating the csv values and storing them in array
 
 		//echo json_encode($data);
 		//$array = array('1','2','3');
-		for($i=0; $i<count($id_loop); $i++)
+		if($id_loop[0]=="")
 		{
-			$record = mysqli_query($con, "SELECT Task_ID, Task_Name, Task_Description, Task_Followers, Task_Tags,Task_Comments FROM $TASK_TABLE
-					WHERE Task_ID= $id_loop[$i]");
+
+		}
+
+		for($i=0; ($i<count($id_loop) && $id_loop[0]!="") ; $i++)
+		{
+			$temp_id_loop=$id_loop[$i];
+			// echo "string";
+			$record = mysqli_query($con,"SELECT Task_ID, Task_Name, Task_Description, Task_Project_ID,Task_Followers,Task_Comments FROM $TASK_TABLE
+					WHERE Task_ID = $temp_id_loop");			
+
 			$result = mysqli_fetch_array($record, MYSQLI_ASSOC);
-
-			//echo json_encode($result);
-
+			// echo $result['Task_Followers'];
+			// echo "string";
+			$taskFollowers=explode(',',$result['Task_Followers']) ;
+			// echo $taskFollowers[0];
+			// echo json_encode($taskFollowers);
+			$taskFollowersObj=array();
+			if($taskFollowers[0]=="")
+			{
+				$result['Task_Followers']=null;
+			}
+			// $tempUserIDs = array(); --same as $taskFollowers
+			for($anotherLoop=0; ($anotherLoop<count($taskFollowers) && $taskFollowers[0]!=""); $anotherLoop++)
+			{
+				$temp=array();
+				$sqlQuery="SELECT User_ID,User_Name FROM $LOGIN_TABLE WHERE User_ID=$taskFollowers[$anotherLoop]";
+				$resultSqlQuery=mysqli_query($con,$sqlQuery);
+				if(!$resultSqlQuery)
+				{
+					echo "Something went wrong!";
+					die();
+				}
+				$recordSqlQuery=mysqli_fetch_array($resultSqlQuery,MYSQLI_ASSOC);
+				$temp['User_ID']=$recordSqlQuery['User_ID'];
+				$temp['User_Name']=$recordSqlQuery['User_Name'];
+				array_push($taskFollowersObj, $temp);
+			}
+			// echo "\n\n";
+			// echo json_encode($taskFollowersObj);
+			// echo "\n\n";
+			// echo json_encode($taskFollowersObj);
+			// echo "\n\n";
+			if($taskFollowers[0]!="")
+			{
+				$result['Task_Followers']=$taskFollowersObj;
+			}
+			
+			// echo "aaa\n\n";
+			// echo json_encode($result['Task_Followers']);
+			// echo "\n\n";
 			$data["allTasks"][] = $result;
 
-			$tag_data = explode(',', $result['Task_Tags']) ;// for separating the csv values and storing them in array	
-			
+			$taglist = mysqli_fetch_array(mysqli_query($con, "SELECT Task_Tags FROM $TASK_TABLE WHERE Task_ID= $temp_id_loop"),MYSQLI_ASSOC);
+			$tag_data = explode(',', $taglist['Task_Tags']) ;
+			// for separating the csv values and storing them in array	
 			//echo json_encode($tag_data);
-			for ($j=0 ; $j<count($tag_data); $j++)
+
+			if($tag_data[0]=="")
+			{
+				$data["allTasks"][$i]["Tags"][]=null;
+			}
+
+			for ($j=0 ; ( $j<count($tag_data) && $tag_data[0]!=""); $j++)
 			{
 				$records = mysqli_query($con, "SELECT Tag_ID, Tag_Name FROM $TAG_TABLE
 					WHERE Tag_ID= $tag_data[$j]");
@@ -71,22 +148,42 @@
 			}
 
 
-			$rec= mysqli_query($con, "SELECT Comment_ID, Comment_Body FROM $COMMENT_TABLE WHERE Comment_Task_ID= $id_loop[$i]");
+			$rec= mysqli_query($con, "SELECT Comment_ID, Comment_Body,User_ID FROM $COMMENT_TABLE WHERE Comment_Task_ID= $temp_id_loop");
 
 			$comment_data = mysqli_fetch_all($rec, MYSQLI_ASSOC);
 
-			foreach ($comment_data as $key => $value) {
-				
-			$data["allTasks"][$i]["Comments"][]= $value;
+			// if there are no comments
+			if(count($comment_data)===0)
+			{
+				$data["allTasks"][$i]["Comments"][]=null;
+			}
 
-				/*echo json_encode($key);
-
-				echo json_encode($value);*/
+			$tempUserIDs = array();
+			for($anotherLoop=0; ($anotherLoop<count($comment_data) && count($comment_data)>0); $anotherLoop++)
+			{
+				array_push($tempUserIDs, $comment_data[$anotherLoop]['User_ID']);
 			}
 			
-					
+			// $tempUserIDs contains all the userIDs in all the comments for a task
+			// echo json_encode($tempUserIDs);
+			
+			//fetch all the names for corresponding UserIDs in $tempUserIDs
+			for($inner=0; $inner<count($tempUserIDs); $inner++)
+			{
+				
+				$username=mysqli_query($con,"SELECT User_Name FROM $USER_TABLE WHERE User_ID = $tempUserIDs[$inner]");	
+				$username=mysqli_fetch_array($username,MYSQLI_ASSOC);
+				$comment_data[$inner]['User_Name']=$username['User_Name'];	
+			}
+			
+			foreach ($comment_data as $key => $value) 
+			{
+				$data["allTasks"][$i]["Comments"][]= $value;
+			}
 		}
 	
-
+	$data['Status']=$errorHandling['Status'];
+	$data['errors']=$errorHandling['errors'];
 	echo json_encode($data);
+	file_put_contents('results.json', json_encode($data));
 ?>

@@ -27,7 +27,8 @@
 	$TASK_TABLE = "task_basic_info";
 	$COMMENT_TABLE = "comment_basic_info";
 	$TAG_TABLE = "tag_basic_info";
-	$USER_TABLE = "user_info";
+	$USER_TABLE = "user_login";
 	$LOGIN_TABLE= "user_login";
+	$PROJECT_TABLE="projects_info";
 
 ?>

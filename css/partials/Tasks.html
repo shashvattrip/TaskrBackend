@@ -1,8 +1,14 @@
 <!-- individual taskNew -->
-<div id="nav1" id="TaskRow{{task.TID}}" ng-repeat="task in JsonData | filter:SearchString | orderBy:sortOrder | filter:{PID:routePID} track by $index" class="row IndividualTaskRow">
-	
+<!-- <div id="nav1" id="TaskRow{{task.TID}}" ng-repeat="task in JsonData | filter:SearchString | orderBy:sortOrder | filter:{PID:routePID} track by $index" class="row IndividualTaskRow"> -->
+
+<!-- ***********NOTE************ -->
+<!-- Some problem with filter:{PID:routePID} Look into it!-->
+<!-- | filter:{task.Task_Project_ID:routePID} -->
+
+<div id="nav1" ng-repeat="task in JsonData | filter:SearchString | orderBy:sortOrder" class="row IndividualTaskRow" ng-show="(routePID==task.Task_Project_ID) || (routePID==0)">
+
 	<div class="century IndividualTaskRowTID">
-		{{task.TID}}
+		{{task.Task_ID}}
 	</div>
 
 	<div ng-show="task.clocked" style="width:15px;float:left;margin-left:5px;margin-top:3px">
@@ -26,11 +32,11 @@
 	</div>
 
 	<div class="century IndividualTaskRowInput" style="margin-top:3px">
-		<span style="float:left;" ng-hide="task.editingTaskName" ng-click="startEditing(task,'taskName')">{{task.TN}}</span>
+		<span style="float:left;" ng-hide="task.editingTaskName" ng-click="startEditing(task,'taskName')">{{task.Task_Name}}</span>
 		
 		
 		<form ng-submit="doneEditing(task,'taskName')" ng-show="task.editingTaskName" style="width:300px;margin-bottom:0px">
-			<input ng-blur="doneEditing(task,'taskName')" ng-focus="task==editedTaskName" ng-model="task.TN" class="century input-large" style="float:left;color:#ffffff;background-color:#77d28e;border:0px solid #d1d1d1;">
+			<input ng-blur="doneEditing(task,'taskName')" ng-focus="task==editedTaskName" ng-model="task.Task_Name" class="century input-large" style="float:left;color:#ffffff;background-color:#77d28e;border:0px solid #d1d1d1;">
 
 		</form>
 		

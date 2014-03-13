@@ -59,7 +59,7 @@
 
             // Structure of DATABASE
             // ************* user_login ************
-            // User_ID | User_Name | User_Email | User_Type (Facebook/Custom) | User_LastLoggedIn | User_Contact | User_Password | User_CreatedDateTime
+            // User_ID | User_Name | User_Email | User_Type (Facebook/Custom) | User_LastLoggedIn | User_Contact | User_Password | User_CreatedDateTime | Project_IDs
 
             // ************* Tasks_Info ************
             // Task_ID | Task_Name | Task_Description | Task_CreatedDateTime | Task_Followers(CSV) | Task_Tags(CSV) | Task_CreatedOn | Task_Completed | Task_Followers | Task_assignedTo | Task_Star | Task_CreatedBy
@@ -74,7 +74,7 @@
             // Project_ID | Project_Name | User_CreatedDateTime | Project_Description | Project_Members | Project_Status
 
             // ************* User_Info ************
-            // User_ID | Task_IDs(CSV)
+            // User_ID | (CSV)
         }
     }
 
@@ -150,11 +150,18 @@
             }
         }
 
-        public function InsertTask($name,$desc)
+        public function InsertTask($objData)
         {
             include 'connect_db.php';
+            $name=$objData->Task_Name;
+            $desc=$objData->Task_Description;
+            // echo json_encode($objData);
+            $projectID=$objData->Task_Project_ID;
+            // echo $projectID;
+            // echo "\n\n";
+            // $projectID=1;
             header('Content-Type: application/json; charset=utf-8');
-            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','','','','','','')";
+            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','',$projectID,'','','','','')";
 
             if(mysqli_query($con,$sql))
             {
@@ -176,9 +183,10 @@
         public function UpdateTask($objData)
         {
             include 'connect_db.php';
-            $name=$objData->TN;
-            $desc=$objData->TD;
-            $id=$objData->TID;
+            $name=$objData->Task_Name;
+            $desc=$objData->Task_Description;
+            $id=$objData->Task_ID;
+            
             //append CommentID
             // $newComment=$objData->
 
@@ -189,13 +197,14 @@
             if(mysqli_query($con,$sql))
             {
                 $str['Status']=TRUE;
-                exit(json_encode($str));                                    
+                $str['UpdatedTask']=TRUE;
+                echo (json_encode($str));                                    
             }
             else 
             {
                 $str['Status']=FALSE;
                 $str['error']='SQL Error in updating task';  
-                exit(json_encode($str));
+                echo (json_encode($str));
             }
         }
     }
@@ -241,14 +250,14 @@
             if(mysqli_query($con,$sql))
             {
                 $str['Status']=TRUE;
-                exit(json_encode($str));                                    
+                echo (json_encode($str));                                    
             }
 
             else 
             {
                 $str['Status']=FALSE;
                 $str['error']='SQL Error in deleting comment';  
-                exit(json_encode($str));
+                echo (json_encode($str));
             }
         }
 
@@ -295,14 +304,120 @@
             {
                 $str['Status']=TRUE;
                 $str['Comment_ID']=mysqli_insert_id($con);
-                exit(json_encode($str));                                    
+                echo (json_encode($str));                                    
             }
             else 
             {
                 $str['Status']=FALSE;
                 $str['error']='SQL Error in inserting comment';  
-                exit(json_encode($str));   
+                echo (json_encode($str));   
             }
+        }
+    }
+
+
+
+    class ProjectAPI
+    {
+        
+        public function DeleteProject($id)
+        {
+            
+        }
+
+        public function InsertProject($objData)
+        {
+            //$objData will contain only Body
+            $name=$objData->Project_Name;
+            // echo $objData->Project_Name;
+            // $name="Shashvat";
+            // $dateCreatedOn=new Date();
+            //add new Date() to the data for comment createdon column
+            include 'connect_db.php';
+            
+            header('Content-Type: application/json; charset=utf-8');
+        
+            $sql = "INSERT INTO $PROJECT_TABLE VALUES(NULL,'$name','','','','')";
+            if(mysqli_query($con,$sql))
+            {
+                
+
+                $str['Status']=TRUE;
+                $str['Project_ID']=mysqli_insert_id($con);
+                // echo $str['Project_ID'];
+                echo (json_encode($str));                                    
+            }
+            else 
+            {
+                $str['Status']=FALSE;
+                $str['error']='SQL Error in inserting comment';  
+                echo (json_encode($str));   
+            }
+        }
+    }
+
+    class User_LoginAPI
+    {
+
+        public function UpdateUser($objData)
+        {
+            //$objData will contain only Body
+            $Task_ID=$objData->Task_ID;
+            $User_ID=$objData->User_ID;
+            $Project_ID=$objData->Project_ID;
+            // echo $User_ID;
+            include 'connect_db.php';
+            
+            header('Content-Type: application/json; charset=utf-8');
+        
+            $sql = "SELECT User_ID,Task_IDs,Project_IDs FROM $LOGIN_TABLE WHERE USER_ID=$User_ID";
+            if($rec=mysqli_query($con,$sql))
+            {
+                // $json=mysqli_fetch_all($sql, MYSQLI_ASSOC);
+                $rec2=mysqli_fetch_all($rec,MYSQLI_ASSOC);
+                // echo json_encode($rec2);
+                $task_ids=$rec2[0]['Task_IDs'];
+                $task_ids = $task_ids . ',' . $Task_ID;
+                $project_ids=$rec2[0]['Project_IDs'];
+                //check if the $Project_ID is present in the $project_ids string
+                $project_id_array=array();
+                $project_id_array=explode(',', $project_ids);
+
+                $project_id_is_present=in_array($Project_ID, $project_id_array);
+                if(!$project_id_is_present)
+                {
+                    $project_ids=$project_ids . ',' . $Project_ID;
+                }
+                
+                // echo $task_ids;
+
+                $sql2 = "UPDATE $LOGIN_TABLE SET Task_IDs='$task_ids', Project_IDs='$project_ids' WHERE User_ID='$User_ID'";
+                
+                
+                // echo json_encode($json);
+                if($rec3=mysqli_query($con,$sql2))
+                {
+                    $str['Status']=TRUE;
+                    
+                    // echo $str['Project_ID'];
+                    echo (json_encode($str));                                    
+                }
+                else 
+                {
+                    $str['Status']=FALSE;
+                    $str['error']='SQL Error in updating User_Login table';  
+                    echo (json_encode($str));   
+                }
+            }
+            else
+            {
+                $str['Status']=FALSE;
+                $str['error']='SQL Error in fetching from user login table. Query Returned False';  
+                echo (json_encode($str));   
+            }
+
+
+            
         }
     }
 

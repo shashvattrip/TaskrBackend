@@ -1,6 +1,6 @@
 <!-- New -->
 <!-- Dynamically injected -->
-<div id="IndiTasksDivID" ng-init="index=getIndexOf(routeTID)" style="max-height:585px;background-color:#EEEEEE;border-top:8px solid #f4f3f3;overflow-y:auto;" >
+<div id="IndiTasksDivID" ng-init="index=getIndexOf(routeTask_ID)" style="max-height:585px;background-color:#EEEEEE;border-top:8px solid #f4f3f3;overflow-y:auto;" >
 					
 	<!-- nav1 -->
 	<div class="century container" style="background-color:#ffffff;height:35px;border-bottom:1px solid #d1d1d1;border-top:1px solid #d1d1d1;width:488px">
@@ -69,7 +69,7 @@
 			</div>
 
 			<form ng-submit="updateTaskrREST('tasks',JsonData[index])" style="margin-left:10px;float:left">
-				<input class="century" style="font-size:12px;color:white;width:300px;background-color:#77D28E;border:1px solid #77D28E;" type="text" ng-model="JsonData[index].TN">
+				<input class="century" style="font-size:12px;color:white;width:300px;background-color:#77D28E;border:1px solid #77D28E;" type="text" ng-model="JsonData[index].Task_Name">
 			</form>
 		</div>
 
@@ -77,7 +77,7 @@
 			<div style="margin-left:40px;float:left;font-size:15px;color:#747474;margin-top:4px"><strong>Description</strong>
 			</div>
 			<form ng-submit="updateTaskrREST('tasks',JsonData[index])" style="margin-left:8px;float:left">
-				<textarea ng-change="updateTaskrREST('tasks',JsonData[index])" class="century" style="font-size:12px;color:white;width:300px;background-color:#77D28E;border:1px solid #77D28E;" type="text" ng-model="JsonData[index].TD"></textarea>
+				<textarea ng-change="updateTaskrREST('tasks',JsonData[index])" class="century" style="font-size:12px;color:white;width:300px;background-color:#77D28E;border:1px solid #77D28E;" type="text" ng-model="JsonData[index].Task_Description"></textarea>
 			</form>
 		</div>
 	</div>
@@ -88,7 +88,7 @@
 		<div style="float:left;margin-right:10px;margin-top:2px"><strong>Tags</strong></div>
 		
 		<!-- Tags go Here -->
-		<div class="tag"ng-click="removeTag(index,tag)" ng-repeat="tag in JsonData[index].tags track by $index" style="">{{tag}}</div>
+		<div class="tag" ng-click="removeTag(index,tag)" ng-repeat="tag in JsonData[index].Tags track by $index" style="cursor:pointer;">{{tag.Tag_Name}}</div>
 
 		<!-- input for new tag -->
 		<form ng-submit="addTag(JsonData[index])" ng-show="AdddingANewTag" style="float:left;margin-bottom:0px">
@@ -116,7 +116,7 @@
 	</div>
 
 	<div class="row century" style="background-color:#E3E3E3;max-height:150px;border-bottom:1px solid #d1d1d1;border-top:0px solid #d1d1d1;color:#747474;overflow-y:auto;overflow-x:hidden">
-		<p class="comment"style="float:left;width:100%;" ng-repeat="comment in JsonData[index].Comments track by $index"> <i><strong>shashvat   </strong></i>says   <i><strong>"{{comment}}"</strong></i></p>
+		<p class="comment"style="float:left;width:100%;" ng-repeat="comment in JsonData[index].Comments track by $index" ng-hide="comment==null"> <i><strong>{{comment.User_Name}}</strong></i> says   <i><strong>"{{comment.Comment_Body}}"</strong></i></p>
 		
 		
 	</div>
@@ -129,7 +129,7 @@
 
 		<div style="width:80px;float:left;margin-left:10px;color:#747474">Followers | </div>
 
-		<div style="cursor:pointer;float:left;margin-right:10px;color:#747474" ng-repeat="follower in JsonData[index].fol" ng-click="removeFollower(JsonData[index],follower)">{{follower}}
+		<div style="cursor:pointer;float:left;margin-right:10px;color:#747474" ng-repeat="follower in JsonData[index].Task_Followers" ng-click="removeFollower(JsonData[index],follower)" ng-hide="follower==null">{{follower.User_Name}}
 		</div>
 	
 

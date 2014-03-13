@@ -1,0 +1,54 @@
+A)	add people to Project
+		Send a mail to the person inviting him to join
+		add him to the project before he/she even joins
+		make userID for him -- check if facebook auth is required
+		
+
+B)	in php/index.php
+		Under type='addNewMember' and operation='insert'
+			add a new team member
+			data given --->  
+			obj=
+			{
+	            "Project_ID":Project_the_new_user_needs_to_be_added_to
+	            "User_ID":UserID_of_the_person_who_added_him
+	            "New_Member_Email":New_Person's_email_address
+	        }
+
+	Things to do in class_response.php
+
+C)	In UpdateTask($objData)
+		1. $objData contains all the values that task_basic_info might contain
+		2. Update the row accordingly
+		3. Append new Comment
+		4. Append new Tag
+		5. Append new Follower
+		6. Add star it
+		7. Add clock it
+
+D)	In InsertTag($objData)
+		1. add current system Date to the column
+
+E)	In addComment($objData)
+		1. Add the current System Date so that the front end can display the comments accorrding to the date/time they where added.
+		2. See which format for date is it simpler to sort. TIMESTAMP/DATETIME
+
+F)	In deleteTask
+		1. Delete the task from the task table
+		2. Delete the taskID from the user_login table
+		3. Delete all CSV values in the user_login table where Task_IDs contain the deleted TaskID
+		4. Delete all comments associated with this task
+
+G)	In allData.php
+		1. Inside "Projects"->
+			"Project_Members":
+			[
+				{
+					"User_Name":"Chudail",
+					"User_ID":97
+				},
+				{
+					"User_Name":"Chudail2",
+					"User_ID":56
+				}
+			]

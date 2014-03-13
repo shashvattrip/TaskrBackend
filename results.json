@@ -1,140 +1,142 @@
 {
    "User":{
-      "User_Name":"Jack",
-      // "User_ID":"1"        Current User ID
+      "User_Name":"Shashvat",
+      "User_ID":"1"
    },
-      //All ther users in the Taskr Database - only these  users can be added as followers
-   // "ListAllUsers":      
-   // [
-   //    {
-   //       "User_Name":"Saransh",
-   //       "User_ID":"12"
-   //    },
-   //    {
-   //       "User_Name":"Sneha",
-   //       "User_ID":"14"
-   //    },
-   //    {
-   //       "User_Name":"Rishabh",
-   //       "User_ID":"11"
-   //    }
-   // ],         
-   
    "Projects":[
       {
          "Project_ID":"1",
-         "Project_Name":"one",
-         "Project_Description":"dsfsdf",
-         "Project_Members":"sdafasdf",
-         "Project_Status":"sadf"
+         "Project_Name":"project1",
+         "Project_Description":"des1",
+         "Project_Members":"",
+         "Project_Status":""
       },
       {
          "Project_ID":"2",
-         "Project_Name":"sadf",
-         "Project_Description":"asdf",
-         "Project_Members":"asdf",
-         "Project_Status":"dsaf"
+         "Project_Name":"project2",
+         "Project_Description":"des2",
+         "Project_Members":"",
+         "Project_Status":""
       },
       {
          "Project_ID":"3",
-         "Project_Name":"sdfas",
-         "Project_Description":"sdf",
-         "Project_Members":"asdf",
-         "Project_Status":"asdf"
-      },
-      null,   	//What is this?
-      null		//What is this?
+         "Project_Name":"project3",
+         "Project_Description":"des3",
+         "Project_Members":"",
+         "Project_Status":""
+      }
    ],
    "allTasks":[
       {
-         "Task_ID":"5",
-         "Task_Name":"dfhdfh",
-         "Task_Description":"dfhdfh",
-         // "Task_Followers":[1,2,5,8], //This should be an array of UserIDs
-         // "Task_Tags":"1,2",			//Not required		
-         "Task_Comments":"1,4",
+         "Task_ID":"1",
+         "Task_Name":"task1",
+         "Task_Description":"des1",
+         "Task_Project_ID":"1",
+         "Task_Followers":[
+            ""
+         ],
+         "Task_Comments":"",
          "Tags":[
-            {
-               "Tag_ID":"1",
-               "Tag_Name":"sad"
-            },
-            {
-               "Tag_ID":"2",
-               "Tag_Name":"sdafsda"
-            }
+            null
          ],
          "Comments":[
             {
                "Comment_ID":"1",
-               "Comment_Body":"comment 1",
-               // "User":  //To tell who made the comment
-               // {
-               // 		"User_ID":3,
-               // 		"User_Name":"Shashvat"
-               // }
+               "Comment_Body":"trolled bitch",
+               "User_ID":"1",
+               "User_Name":"Shashvat"
             },
             {
-               "Comment_ID":"4",
-               "Comment_Body":"Comment 4",
-               // "User":
-               // {
-               // 		"User_ID":5,
-               // 		"User_Name":"Rohan"
-               // }
+               "Comment_ID":"3",
+               "Comment_Body":"comment3",
+               "User_ID":"2",
+               "User_Name":"Ashish"
+            },
+            {
+               "Comment_ID":"5",
+               "Comment_Body":"afsdf\r\n",
+               "User_ID":"3",
+               "User_Name":"Saransh"
             }
          ]
       },
       {
-         "Task_ID":"12",
-         "Task_Name":"sdfsdag",
-         "Task_Description":"agdafgfd",
-         "Task_Followers":"afgdfgdsfh",
-         "Task_Tags":"1,2",
-         "Task_Comments":"2",
+         "Task_ID":"2",
+         "Task_Name":"task2",
+         "Task_Description":"des2",
+         "Task_Project_ID":"2",
+         "Task_Followers":[
+            ""
+         ],
+         "Task_Comments":"",
          "Tags":[
-            {
-               "Tag_ID":"1",
-               "Tag_Name":"sad"
-            },
-            {
-               "Tag_ID":"2",
-               "Tag_Name":"sdafsda"
-            }
+            null
          ],
          "Comments":[
             {
                "Comment_ID":"2",
-               "Comment_Body":"Comment 2"
+               "Comment_Body":"hohoho motherfucker",
+               "User_ID":"1",
+               "User_Name":"Shashvat"
             }
          ]
       },
       {
-         "Task_ID":"13",
-         "Task_Name":"dfshfgjhgt",
-         "Task_Description":"hgjfgj",
-         "Task_Followers":"fgjghj",
-         "Task_Tags":"1,2,3",
-         "Task_Comments":"3",
+         "Task_ID":"3",
+         "Task_Name":"task3",
+         "Task_Description":"des3",
+         "Task_Project_ID":"3",
+         "Task_Followers":[
+            ""
+         ],
+         "Task_Comments":"",
          "Tags":[
-            {
-               "Tag_ID":"1",
-               "Tag_Name":"sad"
-            },
-            {
-               "Tag_ID":"2",
-               "Tag_Name":"sdafsda"
-            },
-            {
-               "Tag_ID":"3",
-               "Tag_Name":"sadf"
-            }
+            null
          ],
          "Comments":[
             {
-               "Comment_ID":"3",
-               "Comment_Body":"Comment 3"
+               "Comment_ID":"4",
+               "Comment_Body":"alkjd",
+               "User_ID":"1",
+               "User_Name":"Shashvat"
             }
          ]
+      },
+      {
+         "Task_ID":"4",
+         "Task_Name":"task4",
+         "Task_Description":"des4",
+         "Task_Project_ID":"1",
+         "Task_Followers":[
+            ""
+         ],
+         "Task_Comments":"",
+         "Tags":[
+            null
+         ],
+         "Comments":[
+            null
+         ]
+      },
+      {
+         "Task_ID":"5",
+         "Task_Name":"task5",
+         "Task_Description":"des5",
+         "Task_Project_ID":"2",
+         "Task_Followers":[
+            ""
+         ],
+         "Task_Comments":"",
+         "Tags":[
+            null
+         ],
+         "Comments":[
+            null
+         ]
       }
+   ],
+   "Status":true,
+   "errors":[
+
    ]
 }
