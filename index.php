@@ -276,7 +276,7 @@
 				
 				
 
-				<div id="nav1" class="project" ng-repeat="project in ListAllProjects" ng-hide="project==0">
+				<div id="nav1" class="project" ng-repeat="project in ListAllProjects">
 					<img src="images/right.png" class="project_pic">
 					<a class="link" ng-href="#/{{project.Project_ID}}" style="color:#989898;font-size:14px">{{project.Project_Name}}</a><br>
 				</div>

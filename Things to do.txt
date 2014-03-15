@@ -17,21 +17,14 @@ B)	in php/index.php
 
 	Things to do in class_response.php
 
-C)	In UpdateTask($objData)
-		1. $objData contains all the values that task_basic_info might contain
-		2. Update the row accordingly
-		3. Append new Comment
-		4. Append new Tag
-		5. Append new Follower
-		6. Add star it
-		7. Add clock it
 
-D)	In InsertTag($objData)
-		1. add current system Date to the column
+C)	Everytime a new user is added, create a new Project with Project_ID = User_ID
+	This Project is his home/default project
 
-E)	In addComment($objData)
-		1. Add the current System Date so that the front end can display the comments accorrding to the date/time they where added.
-		2. See which format for date is it simpler to sort. TIMESTAMP/DATETIME
+D)	Implementing Followers!
+		1. Adding a follower adds their User_ID in Task_Followers column in TASK_TABLE
+		2. Adding a follower adds this TASK_ID to TASK_IDs in LOGIN_TABLE 
+
 
 F)	In deleteTask
 		1. Delete the task from the task table

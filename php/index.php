@@ -40,7 +40,7 @@
 			}
 		}
 
-		if($type=='tags' || $type=='comments' || $type=='tasks' || $type=='projects' || $type=='user_login')
+		if($type=='tags' || $type=='comments' || $type=='tasks' || $type=='projects' || $type=='user_login' || $type=='assignTask')
 		{
 			if($operation=='view'||$operation=='update'||$operation=='insert'||$operation=='delete')
 			{
@@ -149,6 +149,12 @@
 									$obj->UpdateUser($objData);
 
 									break;
+
+								case 'assignTask':
+									$obj = new AssignTask();
+									$data=file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->assign($objData);
 							}
 
 						}

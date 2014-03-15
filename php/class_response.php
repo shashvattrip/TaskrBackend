@@ -20,61 +20,6 @@
             }
 
             
-
-            // follow this format for JSON
-            // create this JSON and send it
-            //this function will be called on PageLoad
-            //Load all tasks that a user has to-do
-            // [
-            //     {"project":
-            //          [    
-                        // {
-                        //     "Project_ID":100,
-                        //     "Project_Name":"Taskr",
-                        //     "Project_status":"active",
-                        //     "Project_Members":[UserID1,UserID2,UserID3],
-                        //     "Project_CreatedOn":"Date"
-                        // }
-            //          ],
-            //     "Task_ID":100,
-            //     "Task_Name":"Study Red Black Trees",
-            //     "Task_Description":"Upcoming Test on DSA",
-            //     "Comments":[
-            //        {"Comment_ID:21","Comment_Body":"Yay, this is a comment"},
-            //        {"Comment_ID:21","Comment_Body":"Yay, this is a comment"},
-            //        {"Comment_ID:21","Comment_Body":"Yay, this is a comment"}],
-            //     "followers":[UserID1,UserID2,UserID3],
-            //     "star":1,
-            //     "DueDate":"14-2-2014",
-            //     "tags":[
-            //              {"Tag_ID1":222,"Tag_Name":"JS"},
-            //              {"Tag_ID1":222,"Tag_Name":"JS"},
-            //              {"Tag_ID1":222,"Tag_Name":"JS"}
-            //            ]
-            //     "assignedTo":["User_ID":123,"User_Name":"Shashvat"],
-            //     "completed":true,
-            //     "clocked":1}
-            // ]
-
-
-            // Structure of DATABASE
-            // ************* user_login ************
-            // User_ID | User_Name | User_Email | User_Type (Facebook/Custom) | User_LastLoggedIn | User_Contact | User_Password | User_CreatedDateTime | Project_IDs
-
-            // ************* Tasks_Info ************
-            // Task_ID | Task_Name | Task_Description | Task_CreatedDateTime | Task_Followers(CSV) | Task_Tags(CSV) | Task_CreatedOn | Task_Completed | Task_Followers | Task_assignedTo | Task_Star | Task_CreatedBy
-
-            // ************* Tags_Info ************
-            // Tag_ID | Tag_Name | Tag_CreatedDateTime 
-
-            // ************* Comments_Info ************
-            // Comment_ID | Comment_Body | Comment_CreatedDateTime | User_ID | Comment_Task_ID(this points to the Task_ID in which this comment was made)
-
-            // ************* Projects_Info ************
-            // Project_ID | Project_Name | User_CreatedDateTime | Project_Description | Project_Members | Project_Status
-
-            // ************* User_Info ************
-            // User_ID | (CSV)
         }
     }
 
@@ -155,21 +100,51 @@
             include 'connect_db.php';
             $name=$objData->Task_Name;
             $desc=$objData->Task_Description;
-            // echo json_encode($objData);
+            $userID=$objData->User_ID;
             $projectID=$objData->Task_Project_ID;
-            // echo $projectID;
-            // echo "\n\n";
-            // $projectID=1;
+
             header('Content-Type: application/json; charset=utf-8');
-            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc','',$projectID,'','','','','')";
+            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc',NOW(),'$projectID','','','','','','')";
 
             if(mysqli_query($con,$sql))
             {
-
-                $str['Status']=TRUE;
-                
                 $str['Task_ID']=mysqli_insert_id($con);
-                echo json_encode($str);                                
+
+                $sql="SELECT Task_IDs FROM $LOGIN_TABLE WHERE User_ID=$userID";
+                if($rec=mysqli_query($con,$sql))
+                {
+                    $row=mysqli_fetch_array($rec,MYSQLI_ASSOC);
+                    $task_ids=$row['Task_IDs'];
+
+                    // echo $task_ids;
+                    if($task_ids!='')
+                    {
+                        $task_ids=$task_ids . ',' . $str['Task_ID'];    
+                    }
+                    else
+                    {
+                        $task_ids=$str['Task_ID'];       
+                    }
+                    
+                    $sql="UPDATE $LOGIN_TABLE SET Task_IDs='$task_ids' WHERE User_ID='$userID'";
+                    if(mysqli_query($con,$sql))
+                    {
+                        $str['Status']=TRUE;
+                        echo (json_encode($str));
+                    }
+                    else
+                    {
+                        $str['Status']=FALSE;
+                        $str['error']="Problem updating USER_LOGIN table with Csv of Task_IDs";
+                        echo json_encode($str);
+                    }
+
+                }
+                else
+                {
+
+                }
+                                              
             }
             else 
             {
@@ -186,12 +161,67 @@
             $name=$objData->Task_Name;
             $desc=$objData->Task_Description;
             $id=$objData->Task_ID;
+            $star=$objData->Task_Star;
+            $clocked=$objData->Task_Clock;
             
-            //append CommentID
-            // $newComment=$objData->
+
+
+            //change followers to a CSV string
+            $followers=array();            
+            $followers=$objData->Task_Followers;
+            if($followers!=null)
+            {
+                $CSVfollowers=$followers[0]->User_ID;
+                for($i=1 ; $i<count($followers) ; $i++)
+                {
+                    $CSVfollowers=$CSVfollowers . ',' . $followers[$i]->User_ID;
+                }
+                // echo $CSVfollowers;    
+            }
+            else
+            {
+                $CSVfollowers=null;
+            }
+
+            //change comments to a CSV string
+            $comments=array();
+            $comments=$objData->Comments;
+            // echo json_encode($comments);
+            if($comments[0]!="")
+            {
+                $CSVcomments=$comments[0]->Comment_ID;
+                for($i=1 ; $i<count($comments) ; $i++)
+                {
+                    $CSVcomments=$CSVcomments . ',' . $comments[$i]->Comment_ID;
+                }
+                // echo $CSVcomments;    
+            }
+            else
+            {
+                $CSVcomments=null;
+            }
+            
+
+            //change comments to a CSV string
+            $tags=array();
+            $tags=$objData->Tags;
+            if($tags!=null)
+            {
+                $CSVtags=$tags[0]->Tag_ID;
+                for($i=1 ; $i<count($tags) ; $i++)
+                {
+                    $CSVtags=$CSVtags . ',' . $tags[$i]->Tag_ID;
+                }
+                // echo $CSVtags;    
+            }
+            else
+            {
+                $CSVtags=null;
+            }
+            
 
             header('Content-Type: application/json; charset=utf-8');
-            $sql = "UPDATE $TASK_TABLE SET Task_Name='$name',Task_Description='$desc' WHERE Task_ID=$id";
+            $sql = "UPDATE $TASK_TABLE SET Task_Name='$name',Task_Description='$desc',Task_Followers='$CSVfollowers',Task_Comments='$CSVcomments', Task_Tags='$CSVtags',Task_Star='$star',Task_Clock='$clocked' WHERE Task_ID=$id";
             // echo json_encode($objData);
 
             if(mysqli_query($con,$sql))
@@ -291,7 +321,7 @@
             
             //$objData will contain only Body
             $body=$objData->Comment_Body;
-            $userID=$objData->UserID;
+            $userID=$objData->User_ID;
             $Comment_Task_ID=$objData->Task_ID;
             // $dateCreatedOn=new Date();
             // echo $body;
@@ -299,12 +329,50 @@
             //add new Date() to the data for comment createdon column
             header('Content-Type: application/json; charset=utf-8');
         
-            $sql = "INSERT INTO $COMMENT_TABLE VALUES(NULL,'$body','','$userID','$Comment_Task_ID')";
+            $sql = "INSERT INTO $COMMENT_TABLE VALUES(NULL,'$body',NOW(),'$userID','$Comment_Task_ID')";
             if(mysqli_query($con,$sql))
             {
-                $str['Status']=TRUE;
+
                 $str['Comment_ID']=mysqli_insert_id($con);
-                echo (json_encode($str));                                    
+
+                $sql = "SELECT Task_Comments FROM $TASK_TABLE WHERE Task_ID=$userID";
+                if($rec=mysqli_query($con,$sql))
+                {
+                    $row=mysqli_fetch_array($rec,MYSQLI_ASSOC);
+                    $comment_ids=$row['Task_Comments'];
+                    // echo $task_ids;
+                    if($comment_ids!='')
+                    {
+                        $comment_ids=$comment_ids . ',' . $str['Comment_ID'];
+                        // echo $comment_ids; 
+                        // echo "\n\n";
+                        // echo $Comment_Task_ID;
+                        // echo "\n\n";
+                    }
+                    else
+                    {
+                        $comment_ids=$str['Comment_ID'];       
+                    }
+
+                    $sql="UPDATE $TASK_TABLE SET Task_Comments='$comment_ids' WHERE Task_ID='$Comment_Task_ID' ";
+                    if(mysqli_query($con,$sql))
+                    {
+                        $str['Status']=TRUE;
+                        echo (json_encode($str));    
+                    }
+                    else
+                    {
+                        $str['Status']=FALSE;
+                        $str['error']="Something went wrong while adding comment to the Task Table!";
+                        echo (json_encode($str));
+                    }
+                }
+                else
+                {
+                    $str['Status']=FALSE;
+                    $str['error']="Something went wrong while getting Comments from Task Table!";
+                    echo (json_encode($str));
+                }
             }
             else 
             {
@@ -329,7 +397,7 @@
         {
             //$objData will contain only Body
             $name=$objData->Project_Name;
-            // echo $objData->Project_Name;
+            // $objData->Project_Name;
             // $name="Shashvat";
             // $dateCreatedOn=new Date();
             //add new Date() to the data for comment createdon column
@@ -337,15 +405,38 @@
             
             header('Content-Type: application/json; charset=utf-8');
         
-            $sql = "INSERT INTO $PROJECT_TABLE VALUES(NULL,'$name','','','','')";
+            $sql = "INSERT INTO $PROJECT_TABLE VALUES(NULL,'$name',NOW(),'','','')";
             if(mysqli_query($con,$sql))
             {
-                
-
-                $str['Status']=TRUE;
+                //Update the LOGIN_TABLE to add this new project into the CSV column
                 $str['Project_ID']=mysqli_insert_id($con);
-                // echo $str['Project_ID'];
-                echo (json_encode($str));                                    
+                $sql="SELECT Project_IDs FROM $LOGIN_TABLE WHERE User_ID=$objData->User_ID";
+                if($record=mysqli_query($con,$sql))
+                {
+                    $row=mysqli_fetch_array($record,MYSQLI_ASSOC);
+                    $CSV=$row['Project_IDs'];
+                    $CSV=$CSV . ',' . $str['Project_ID'];
+                    $sql = "UPDATE $LOGIN_TABLE SET Project_IDs='$CSV' WHERE User_ID='$objData->User_ID'";
+                    if(mysqli_query($con,$sql))
+                    {
+                        $str['Status']=TRUE;
+                        $str['ppp']=$CSV;
+                        // echo $str['Project_ID'];
+                        echo (json_encode($str));    
+                    }
+                    else
+                    {
+                        $str['Status']=FALSE;
+                        $str['CSV_Project_IDs']=$CSV;
+                        // echo $str['Project_ID'];
+                        echo (json_encode($str));       
+                    }
+                }
+                else
+                {
+                    $str['Status']=FALSE;
+                    $str['error']="Check InsertProject in class_response";
+                }
             }
             else 
             {
@@ -421,6 +512,17 @@
         }
     }
 
+
+    class AssignTask
+    {
+        public function assign($objData)
+        {
+            $userID=$objData->User_ID;
+            echo json_encode($objData);
+        }
+    }
+
+
     class TagAPI
     {
         public function getTag($id)
@@ -484,13 +586,47 @@
             //add created on date value
             // $date=new Date();
 
-            $sql = "INSERT INTO $TAG_TABLE VALUES(NULL,'$name','')";
+            $sql = "INSERT INTO $TAG_TABLE VALUES(NULL,'$name',NOW())";
                
             if(mysqli_query($con,$sql))
             {
-                $str['Status']=TRUE;
                 $str['Tag_ID']=mysqli_insert_id($con);
-                exit(json_encode($str));                                    
+                $sql="SELECT Task_Tags FROM $TASK_TABLE WHERE Task_ID=$objData->Task_ID";
+                if($rec=mysqli_query($con,$sql))
+                {
+                    $row=mysqli_fetch_array($rec,MYSQLI_ASSOC);
+                    $task_ids=$row['Task_Tags'];
+                    // echo $task_ids;
+                    if($task_ids!='')
+                    {
+                        $task_ids=$task_ids . ',' . $str['Tag_ID'];    
+                    }
+                    else
+                    {
+                        $task_ids=$str['Tag_ID'];       
+                    }
+                    
+                    $sql="UPDATE $TASK_TABLE SET Task_Tags='$task_ids' WHERE Task_ID='$objData->Task_ID'";
+                    if(mysqli_query($con,$sql))
+                    {
+                        $str['Status']=TRUE;
+                        echo (json_encode($str));
+                    }
+                    else
+                    {
+                        $str['Status']=FALSE;
+                        $str['error']="Problem adding the Tag to TASK_TABLE CSV";
+                        echo json_encode($str);
+                    }
+                }
+                else
+                {
+                    $str['Status']=FALSE;
+                    $str['error']="Problem Accessing Task table while adding a tag";
+                    echo json_encode($str); 
+                }
+                
+                
             }
 
             else 

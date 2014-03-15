@@ -1,4 +1,4 @@
-<!-- New -->
+
 <!-- Dynamically injected -->
 <div id="IndiTasksDivID" ng-init="index=getIndexOf(routeTask_ID)" style="max-height:585px;background-color:#EEEEEE;border-top:8px solid #f4f3f3;overflow-y:auto;" >
 					
@@ -12,9 +12,11 @@
 
 				
 			</div>
+			<select style="float:left;margin-top:5px;margin-left:14px;">
+				<option ng-repeat="member in ListAllProjects[getProjectIDfromStateParams()].Project_Members">{{member.User_Name}}</option>				
+			</select>
 			<div  style="float:left;margin-top:5px;margin-left:14px;" ng-click="addAssignedTo(index)">
-				{{JsonData[index].assignedTo}}
-				
+				{{getAssignedTo(JsonData[index])}}
 			</div>
 			<div  style="float:right;margin-top:3px;margin-right:3px;">
 				<a href="" >
@@ -116,7 +118,7 @@
 	</div>
 
 	<div class="row century" style="background-color:#E3E3E3;max-height:150px;border-bottom:1px solid #d1d1d1;border-top:0px solid #d1d1d1;color:#747474;overflow-y:auto;overflow-x:hidden">
-		<p class="comment"style="float:left;width:100%;" ng-repeat="comment in JsonData[index].Comments track by $index" ng-hide="comment==null"> <i><strong>{{comment.User_Name}}</strong></i> says   <i><strong>"{{comment.Comment_Body}}"</strong></i></p>
+		<p class="comment"style="float:left;width:100%;" ng-repeat="comment in JsonData[index].Comments | orderBy:comment.Comment_CreatedDateTime track by $index" ng-hide="comment==null"> <i><strong>{{comment.User_Name}}</strong></i> says   <i><strong>"{{comment.Comment_Body}}"</strong></i></p>
 		
 		
 	</div>
@@ -145,3 +147,4 @@
 	</div>
 </div>
 
+<button ng-click="getProjectIDfromStateParams()">Click</button>
