@@ -12,8 +12,9 @@
 
 				
 			</div>
-			<select style="float:left;margin-top:5px;margin-left:14px;">
-				<option ng-repeat="member in ListAllProjects[getProjectIDfromStateParams()].Project_Members">{{member.User_Name}}</option>				
+			<select style="float:left;width:80px;margin-top:5px;margin-left:14px;" ng-Change="addAssignedTo(JsonData[index])" ng-model="tempAssignedTo">
+				<option value="" style="display:none;">Assign To</option>
+				<option value="{{member.User_ID}}" ng-repeat="member in ListAllProjects[getProjectIDfromStateParams()].Project_Members">{{member.User_Name}}</option>				
 			</select>
 			<div  style="float:left;margin-top:5px;margin-left:14px;" ng-click="addAssignedTo(index)">
 				{{getAssignedTo(JsonData[index])}}
@@ -44,16 +45,16 @@
 		<div style="float:left;margin-top:7px">
 			<img style="height:15px;margin-left:20px"src="images/pin.png">
 
-			<img ng-show="JsonData[index].star" ng-click="starTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/luv-true.png">
+			<img ng-show="JsonData[index].Task_Star" ng-click="starTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/luv-true.png">
 			
-			<img ng-hide="JsonData[index].star" ng-click="starTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/luv.png">
+			<img ng-hide="JsonData[index].Task_Star" ng-click="starTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/luv.png">
 
 			
 			<img style="height:15px;margin-left:14px" src="images/lock.png">
 			
-			<img ng-show="JsonData[index].clocked" ng-click="clockTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/clock-true.png">
+			<img ng-show="JsonData[index].Task_Clock" ng-click="clockTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/clock-true.png">
 
-			<img ng-hide="JsonData[index].clocked" ng-click="clockTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/clock-false.png">
+			<img ng-hide="JsonData[index].Task_Clock" ng-click="clockTask(JsonData[index])" style="height:15px;margin-left:14px;cursor:pointer;" src="images/clock-false.png">
 			
 			<img ng-click="removeTask(JsonData[index])" style="height:18px;margin-left:30px;cursor:pointer;" src="images/delete.png">
 			

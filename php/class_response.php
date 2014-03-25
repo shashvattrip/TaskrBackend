@@ -104,7 +104,7 @@
             $projectID=$objData->Task_Project_ID;
 
             header('Content-Type: application/json; charset=utf-8');
-            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc',NOW(),'$projectID','','','','','','')";
+            $sql = "INSERT INTO $TASK_TABLE VALUES(NULL,'$name','$desc',NOW(),'$projectID','','','','','','',0)";
 
             if(mysqli_query($con,$sql))
             {
@@ -163,6 +163,7 @@
             $id=$objData->Task_ID;
             $star=$objData->Task_Star;
             $clocked=$objData->Task_Clock;
+            $completed=$objData->Task_Completed;
             
 
 
@@ -221,7 +222,7 @@
             
 
             header('Content-Type: application/json; charset=utf-8');
-            $sql = "UPDATE $TASK_TABLE SET Task_Name='$name',Task_Description='$desc',Task_Followers='$CSVfollowers',Task_Comments='$CSVcomments', Task_Tags='$CSVtags',Task_Star='$star',Task_Clock='$clocked' WHERE Task_ID=$id";
+            $sql = "UPDATE $TASK_TABLE SET Task_Name='$name',Task_Description='$desc',Task_Followers='$CSVfollowers',Task_Comments='$CSVcomments', Task_Tags='$CSVtags',Task_Star='$star',Task_Clock='$clocked',Task_Completed='$completed' WHERE Task_ID=$id";
             // echo json_encode($objData);
 
             if(mysqli_query($con,$sql))
@@ -397,7 +398,7 @@
         {
             //$objData will contain only Body
             $name=$objData->Project_Name;
-            // $objData->Project_Name;
+            $userID=$objData->User_ID;
             // $name="Shashvat";
             // $dateCreatedOn=new Date();
             //add new Date() to the data for comment createdon column
@@ -405,7 +406,7 @@
             
             header('Content-Type: application/json; charset=utf-8');
         
-            $sql = "INSERT INTO $PROJECT_TABLE VALUES(NULL,'$name',NOW(),'','','')";
+            $sql = "INSERT INTO $PROJECT_TABLE VALUES(NULL,'$name',NOW(),'','$userID','Active')";
             if(mysqli_query($con,$sql))
             {
                 //Update the LOGIN_TABLE to add this new project into the CSV column
@@ -415,7 +416,15 @@
                 {
                     $row=mysqli_fetch_array($record,MYSQLI_ASSOC);
                     $CSV=$row['Project_IDs'];
-                    $CSV=$CSV . ',' . $str['Project_ID'];
+                    if($CSV=='')
+                    {
+                        $CSV=$str['Project_ID'];
+                    }
+                    else
+                    {
+                        $CSV=$CSV . ',' . $str['Project_ID'];    
+                    }
+                    
                     $sql = "UPDATE $LOGIN_TABLE SET Project_IDs='$CSV' WHERE User_ID='$objData->User_ID'";
                     if(mysqli_query($con,$sql))
                     {
@@ -517,11 +526,77 @@
     {
         public function assign($objData)
         {
+            //assign the task to this user
             $userID=$objData->User_ID;
-            echo json_encode($objData);
+
+            //this task needs to be assigned to the above user
+            $taskID=$objData->Task_ID;
+            include_once 'connect_db.php';
+            // echo json_encode($objData);
+            $sql="UPDATE $TASK_TABLE SET Task_assignedTo='$userID' WHERE Task_ID='$taskID'";
+
+            if(mysqli_query($con,$sql))
+            {
+                $str['Status']=TRUE;
+
+                echo json_encode($str);
+            }
+            else
+            {
+                $str['Status']=FALSE;
+                $str['error']="Problem with AssignTask Class";
+                echo json_encode($str);
+            }
+            
         }
     }
 
+
+    class addNewMember
+    {
+
+        public function insertNewMember($objData)
+        {
+            $project_id=$objData->Project_ID;
+            $user_id=$objData->User_ID;
+            $newMember=$objData->New_Member_Email;
+
+            //check if new member email is present in the user login table or not
+            //if yes
+            //add this user to the project
+            //in project_info table, add this user ID to Project_members 
+
+            //if no
+            //add send a mailer inviting the user to the Taskr
+            //insert a new user in user_login once he registers using facebook
+            //add him to the project once he registers on taskr
+            
+            include 'connect_db.php';
+            $query  =mysqli_query($con, "SELECT User_ID FROM $LOGIN_TABLE WHERE User_Email LIKE '$newMember'");
+            $rec=mysqli_fetch_array($query);
+            if($rec)
+            {
+                
+                $res = mysqli_fetch_array(mysqli_query($con,"SELECT Project_members FROM $PROJECT_TABLE WHERE Project_ID = $project_id"));
+                $members = array_push($res['Project_members'], $rec['User_ID']);
+                $project  = mysqli_query($con, "UPDATE $PROJECT_TABLE SET Project_members = $members ");
+                if($project)
+                {
+                    echo "Done";
+                }
+                else
+                {
+                    echo "not done" . mysql_error($project);
+                }
+            }
+            else
+            {
+                include '/email/emailsend.php';
+            }
+
+            echo json_encode($objData);
+        }
+    }
 
     class TagAPI
     {

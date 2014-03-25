@@ -1,13 +1,3 @@
-<?php
-    session_start();
-    // $_SESSION['login']=FALSE;
-    if(isset($_SESSION['login']) && $_SESSION['login']==TRUE)
-    {
-        header('Location: index.html');
-    }
-
-    
-?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -61,7 +51,6 @@
                           <input name="password" class="inputbox password" style="color:#747474"type="password" placeholder="Password" />
                         <p style="padding-top:10px;">
                             <button type="submit">Login</button>
-                            <a href="redirectLinkedin.php"><img src="linkedinbtn.png"></a>
                         </p>
                     </form>
                         <p style="padding-top:10px">Forget password? It's ok. 
@@ -75,7 +64,13 @@
 
                 <div class="social" style="padding-top:10px">
 
-                    <a href="#" class="facebook"><i class="icon-facebook"></i></a>
+
+
+                <?php
+                        include 'facebook.php';
+         
+                ?>
+                    <!-- <a href="login2.php" class="facebook"><i class="icon-facebook"></i></a> -->
                     <a href="#" class="twitter"><i class="icon-twitter"></i></a>
                     <a href="#" class="google"><i class="icon-gplus"></i></a>
                 </div>
@@ -90,6 +85,7 @@
         <!--Signup Section-->
         <div class="section" id="section2">
         <div class="signup-form" style="margin-left:353px">
+
             <h1>Sign Up in Seconds!</h1>
             <p>Signup using your Email address</p>
             <div>
@@ -105,6 +101,7 @@
             <hr />
               <p>Or you can Signup with one of the following</p>
             <div class="social" style="padding-top:20px">
+                
                 <a href="#" class="facebook" ><span style="padding-left:24px">Facebook</span></a>
                 <a href="#" class="twitter"></i><span style="padding-left:24px">Twitter</span></a>
                 <a href="#" class="google"></i><span style="padding-left:24px">Google</span></a>

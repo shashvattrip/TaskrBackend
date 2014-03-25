@@ -1,3 +1,21 @@
+<?php
+		session_start();
+		include 'php/facebook/connect_db.php';
+		$fb_id = $_SESSION['userdetails']['id'];
+		//echo $fb_id;
+		$sql=mysqli_query($con,"SELECT User_ID FROM $LOGIN_TABLE WHERE Facebook_ID = $fb_id");
+		if($sql)
+		{
+			$id_array = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+			$id = $id_array['User_ID'];
+			//echo json_encode($id_array);
+			// echo $id;
+		}
+		else
+		{
+			header('Location: login.php');
+		}
+?>
 <!DOCTYPE html>
 <html ng-app="myapp" lang="en">
 <head>
@@ -108,7 +126,12 @@
 	}
 
 </style>
-
+<div style="display:none;" id="shashvat"> 
+	<!-- Whose your daddy, girl?^^^^^^ -->
+	<?php
+	echo $id;
+	?>
+</div>
 <body id="BODYID" ng-controller="DataCtrl" ng-init="fullCallAPI()" style="overflow-y:hidden;">
 	<!--
 	<script>
@@ -144,6 +167,13 @@
 		    	<a class="nav" ng-href="#/calendar" style="color:white;">
 		    		view calendar!
 		    	</a>
+		    	<a id="phpUserID" class="nav" ng-href="#/calendar" style="color:white;">
+		    		<?php
+		    			echo $id;
+		    		?>
+
+		    	</a>
+		    	
 		    	<form method="post" action="php/logout.php">
 		    		<button type="submit">Logout</button>
 		    	</form>

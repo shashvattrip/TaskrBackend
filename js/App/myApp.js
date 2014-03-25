@@ -33,8 +33,9 @@ myapp.directive('ngFocus', function( $timeout ) {
 
 myapp.factory('RESTAPI',function($resource)
 {
-    var BASE_API_URI='http://localhost/api/:table/:operation/?id=:id';
-    
+    // var BASE_API_URI='http://172.17.16.85/api/:table/:operation/?id=:id';
+    // var BASE_API_URI='http://celbits.org.in/sis/TaskrBackend/api/:table/:operation/?id=:id';
+    var BASE_API_URI='http://localhost/api/:table/:operation/?id=:id';    
     return $resource(BASE_API_URI,
             {
                 id:"@id",
@@ -88,9 +89,13 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
         //Redirect to my tasks
         $location.path('/');
+        var testVar=document.getElementById('shashvat').innerText;
+        console.log(typeof(testVar));
+        console.log("Shashvat");
+        // console.log($scope.tttttt);
         //gets all the tags/tasks/comments in the table
         //************this works************
-        RESTAPI.getAllData({table:'GetAllData'}).$promise.then(function(value)
+        RESTAPI.getAllData({table:'GetAllData'},{id:testVar}).$promise.then(function(value)
         {
             if(value.Status==false)
             {
@@ -674,18 +679,6 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         return false;
     };
 
-    // $scope.addPeopleToProject=function()
-    // {
-    //     if(!$scope.newTeamMember)
-    //         return; 
-    //     else
-    //     {
-    //         //check if the team member is already present in ListAllMembers
-    //         console.log("here");
-
-    //         $scope.newTeamMember='';
-    //     }
-    // }
 
     $scope.SetSelectedTags=function(tag)
     {
@@ -708,7 +701,13 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
 
     $scope.addFollower=function(task)
     {
-        
+        //send the name to Server
+
+        //Expect a request - 'true' if the user is already in taskr, add him to the project
+        // 'false' - he's not on taskr -send him a mailer to join - some mechanism to recognize which project he will join when he registers through facebook
+        // 'false positive' - when he is present on taskr but not involved with the project
+
+
         $scope.AddingANewFollower=0;
         $scope.newFollower='';
     }
@@ -728,23 +727,22 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
     }
 
 
-    $scope.addAssignedTo=function(index)
+    $scope.addAssignedTo=function(task)
     {
-        // console.log("Passing index");
-        // console.log(index);
-        // if(!$scope.JsonData[index].Task_assignedTo)
-        //     $scope.JsonData[index].Task_assignedTo="Shashvat";
-        // else 
-        //     $scope.JsonData[index].Task_assignedTo="changed";
+        
+        console.log($scope.tempAssignedTo);
+        
         var obj={
-            "User_ID":"5",
-            "AssignedByUserID":$scope.UserInfo.User_ID,
-            "User_Name":"Sneha"
+            "User_ID":$scope.tempAssignedTo,
+            "Task_ID":task.Task_ID
         };
-
+    
+        console.log("Assigning Task");
+        console.log(obj);
         RESTAPI.addAssignedTo({tableName:"assignTask"},obj).$promise.then(function(value)
         {
             console.log(value);
+            
         },function(errResponse)
         {
             console.log(errResponse);
@@ -814,6 +812,27 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         $scope.insertTaskrREST("comments",tempComment);
         //update the
         $scope.comment='';
+    }
+
+    $scope.funcfunc=function(task)
+    {
+        var tempTask=task;
+        if(task.Task_Completed=="0")
+        {
+            tempTask.Task_Completed="1";
+            console.log("0");
+        }
+        else
+        {
+            tempTask.Task_Completed="0";
+            console.log("1");
+        }   
+        // else
+            // console.log(task.Task_Completed);
+        // console.log(task.Task_Completed)
+
+
+        $scope.updateTaskrREST("tasks",tempTask);
     }
 
     $scope.starTask=function(task)
@@ -915,17 +934,18 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         //If the user isn't on a project, the invitation will be sent out and the new team member will be added but not associated with any project
 
         //Ensure that the user has selected a project
-
+        var tempProjectID=$stateParams.PID;
+        if(tempProjectID=='')
+            tempProjectID=$scope.UserInfo.User_ID;
         var obj={
-            "Project_ID":$scope.routePID,
+            "Project_ID":tempProjectID,
             "User_ID":$scope.UserInfo.User_ID,
             "New_Member_Email":$scope.newTeamMember
         };
 
-        $scope.newTeamMember='';
-        RESTAPI.addPeopleToProject({table:'addPeople'},obj).$promise.then(function(value)
+        RESTAPI.addPeopleToProject({table:'addNewMember'},obj).$promise.then(function(value)
         {
-            console.log("Successfully sent pachage to server");
+            console.log("Successfully sent package to server");
             //value will contain
             // obj=
             // {
@@ -939,7 +959,8 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         {
             console.log("Error while adding a new team member");
         });
-        
+
+        $scope.newTeamMember='';
     }
 
     $scope.printTasks=function()

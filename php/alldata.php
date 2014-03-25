@@ -1,7 +1,8 @@
 <?php
 	include_once 'connect_db.php';
     header('Content-Type: application/json; charset=utf-8');
-	$u_id= "1";//$_GET['id'];
+	$u_id= $_GET['id'];
+	
 	
 	$errorHandling['errors'] = array();
 	$errorHandling['Status']=TRUE;
@@ -46,9 +47,8 @@
 
 		if($record===FALSE)
 		{
-			// $str="Error in retreiving pids in the $pid_loop";
-			// array_push($errorHandling['errors'],$str);
 			$errorHandling['Status']=FALSE;
+			array_push($errorHandling['errors'], "In alldata.php, Error in retreiving pids in the $pid_loop");
 		}
 		else
 		{
@@ -79,6 +79,7 @@
 					else
 					{
 						$errorHandling['Status']=FALSE;
+						array_push($errorHandling['errors'], "line 84");
 					}
 				}
 
@@ -109,7 +110,7 @@
 		{
 			$temp_id_loop=$id_loop[$i];
 			// echo "string";
-			$record = mysqli_query($con,"SELECT Task_ID, Task_Name, Task_Description, Task_Project_ID,Task_Followers,Task_Comments,Task_Star,Task_Clock,Task_assignedTo FROM $TASK_TABLE
+			$record = mysqli_query($con,"SELECT Task_ID, Task_Name, Task_Description, Task_Project_ID,Task_Followers,Task_Comments,Task_Star,Task_Clock,Task_assignedTo,Task_Completed FROM $TASK_TABLE
 					WHERE Task_ID = $temp_id_loop");			
 
 			$result = mysqli_fetch_array($record, MYSQLI_ASSOC);

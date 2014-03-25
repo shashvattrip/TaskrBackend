@@ -11,23 +11,23 @@
 		{{task.Task_ID}}
 	</div>
 
-	<div ng-show="task.clocked" style="width:15px;float:left;margin-left:5px;margin-top:3px">
+	<div ng-show="task.Task_Clock" style="width:15px;float:left;margin-left:5px;margin-top:3px">
 		<img ng-click="clockTask(task)" src="images/clock-true.png">
 	</div>
 
-	<div ng-hide="task.clocked" style="width:15px;float:left;margin-left:5px;margin-top:3px">
+	<div ng-hide="task.Task_Clock" style="width:15px;float:left;margin-left:5px;margin-top:3px">
 		<img ng-click="clockTask(task)" src="images/clock-false.png">
 	</div>
 
-	<div ng-show="task.star" style="width:15px;float:left;margin-left:5px;margin-top:3px">
+	<div ng-show="task.Task_Star" style="width:15px;float:left;margin-left:5px;margin-top:3px">
 		<img ng-click="starTask(task)" src="images/luv-true.png">
 	</div>
-	<div ng-hide="task.star" style="width:15px;float:left;margin-left:5px;margin-top:3px">
+	<div ng-hide="task.Task_Star" style="width:15px;float:left;margin-left:5px;margin-top:3px">
 		<img ng-click="starTask(task)" src="images/luv.png">
 	</div>
 
 	<div class="IndividualTaskRowCheckBox">
-		<input type="checkbox" ng-model="task.completed">
+		<input type="checkbox" ng-model="task.Task_Completed" ng-click="funcfunc(task)">
 
 	</div>
 

@@ -4,6 +4,13 @@
 	$DB_HOST = "localhost";
 	$DB_USER = "root";
 	$DB_PASSWORD = "";
+	// username="conquatd_taskr"
+	// password: shashvat
+
+	// $DB_NAME = "conquatd_Taskr-REST";
+	// $DB_HOST = "localhost";
+	// $DB_USER = "conquatd_taskr";
+	// $DB_PASSWORD = "shashvat";
 
 	$con=mysqli_connect($DB_HOST, $DB_USER,'','');
 

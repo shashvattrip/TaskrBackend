@@ -40,7 +40,7 @@
 			}
 		}
 
-		if($type=='tags' || $type=='comments' || $type=='tasks' || $type=='projects' || $type=='user_login' || $type=='assignTask')
+		if($type=='tags' || $type=='comments' || $type=='tasks' || $type=='projects' || $type=='user_login' || $type=='assignTask' || $type=='addNewMember')
 		{
 			if($operation=='view'||$operation=='update'||$operation=='insert'||$operation=='delete')
 			{
@@ -194,6 +194,12 @@
 									$obj->insertProject($objData);
 									break;
 
+								case 'addNewMember':
+									$obj = new addNewMember();
+									$data=file_get_contents("php://input");
+									$objData=json_decode($data);
+									$obj->insertNewMember($objData);
+									break;
 								// case 'user_login':
 								// 	$obj = new User_LoginAPI();
 								// 	$data=file_get_contents("php://input");
@@ -217,6 +223,7 @@
 		{
 			$str['Status']=FALSE;
 			$str['error']='Type Mismatch';	
+			$str['type_sent']=$type;
 			exit(json_encode($str));
 		}
 	
