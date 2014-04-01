@@ -1,1 +1,1 @@
-{"User":{"User_Name":"Ashish Yadav","User_ID":"8"},"Projects":[{"Project_ID":"8","Project_Name":"Ashish Yadav project","Project_Description":"Default Project","Project_Members":[{"User_ID":"8","User_Name":"Ashish Yadav"}],"Project_Status":"Active"}],"Status":true,"errors":[]}
+{"User":null,"Status":false,"errors":["Some Error while retreiving ProjectIDs in alldata.php"]}

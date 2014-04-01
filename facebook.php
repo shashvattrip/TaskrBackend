@@ -9,7 +9,7 @@ session_start();
               'fileUpload' => false, // optional
               'allowSignedRequest' => false, // optional, but should be set to false for non-canvas apps
           );
-
+          $server = array_merge($_GET,$_REQUEST,$_POST);
         $ip = "localhost";
         $facebook = new Facebook($config);
         $user_id = $facebook->getUser();
@@ -157,11 +157,11 @@ session_start();
                     die();
                 }
                 // getType($_REQUEST['state'])=="integer"
-                if(strlen($_REQUEST['state']<6))
+                if($server['pid'])
                 {
                     // echo "Control is coming here";
                     // die();
-                    $res = mysqli_fetch_array(mysqli_query($con,"SELECT Project_members FROM $PROJECT_TABLE WHERE Project_ID = '$_REQUEST[state]'"));
+                    $res = mysqli_fetch_array(mysqli_query($con,"SELECT Project_members FROM $PROJECT_TABLE WHERE Project_ID = '$server[pid]'"));
                     $tempProjectMembers=array();
 
                     $tempProjectMembers=explode(',',$res['Project_members']);
@@ -196,7 +196,7 @@ session_start();
                     echo "CSV\n";  
                     echo $membersCSV;
                   
-                    $project  = mysqli_query($con, "UPDATE $PROJECT_TABLE SET Project_Members = '$membersCSV' WHERE Project_ID = '$_REQUEST[state]'");
+                    $project  = mysqli_query($con, "UPDATE $PROJECT_TABLE SET Project_Members = '$membersCSV' WHERE Project_ID = '$server[pid]'");
 
                     if($project)
                     {
@@ -208,7 +208,7 @@ session_start();
                         die();
                     }
 
-                    $Proj_IDs = $common_id . "," . $_REQUEST['state'];
+                    $Proj_IDs = $common_id . "," . $server['pid'];
                     $update  = mysqli_query($con,"UPDATE $LOGIN_TABLE SET Project_IDs = '$Proj_IDs' WHERE User_ID = $common_id");
                     if($update)
                     {

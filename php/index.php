@@ -32,7 +32,7 @@
 			if($_SERVER['REQUEST_METHOD']=='GET')
 			{
 				// header('Content-Type: application/json; charset=utf-8');
-				include_once('allData.php');
+				include_once('allData2.php');
 				// $str['Status']=TRUE;
 				// $str['Shashvat']="Shashvat";
 				// echo json_encode($str);

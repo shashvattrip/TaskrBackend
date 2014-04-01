@@ -5,20 +5,17 @@
 	<!-- nav1 -->
 	<div class="century container" style="background-color:#ffffff;height:35px;border-bottom:1px solid #d1d1d1;border-top:1px solid #d1d1d1;width:488px">
 
-		<div  id="nav1" class="right-nav">
+		<div ng-init="name=initOftempAssignedTo(JsonData[index])" id="nav1" class="right-nav">
 			<div style="float:left;">
-				
-				<img ng-click="addAssignedTo(index)" class="teampic" style="height:19px; margin-left:10px;margin-top:7px" src="images/pic.png">
-
-				
+				<img class="teampic" style="height:19px; margin-left:10px;margin-top:7px" src="images/pic.png">
 			</div>
-			<select style="float:left;width:80px;margin-top:5px;margin-left:14px;" ng-Change="addAssignedTo(JsonData[index])" ng-model="tempAssignedTo">
-				<option value="" style="display:none;">Assign To</option>
+			<select  style="float:left;width:80px;margin-top:5px;margin-left:14px;" ng-Change="addAssignedTo(JsonData[index])" ng-model="tempAssignedTo">
+				<option value="" style="display:none;">{{tempPrintingNameofAssignedTo}}</option>
 				<option value="{{member.User_ID}}" ng-repeat="member in ListAllProjects[getProjectIDfromStateParams()].Project_Members">{{member.User_Name}}</option>				
 			</select>
-			<div  style="float:left;margin-top:5px;margin-left:14px;" ng-click="addAssignedTo(index)">
+			<!-- <div  style="float:left;margin-top:5px;margin-left:14px;" ng-click="addAssignedTo(index)">
 				{{getAssignedTo(JsonData[index])}}
-			</div>
+			</div> -->
 			<div  style="float:right;margin-top:3px;margin-right:3px;">
 				<a href="" >
 					<img ng-click="removeAssignedTo(index)" class="teampic" style="height:12px; margin-left:0px;margin-top:0px" src="images/close.png">

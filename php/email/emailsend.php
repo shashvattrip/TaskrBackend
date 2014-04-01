@@ -36,8 +36,8 @@ require_once('/facebook/php-sdk/facebook.php');
 		        'canvas'    => 1,
 		        'fbconnect' => 0,
 		        'scope' => 'email,publish_stream,offline_access',
-		        'redirect_uri' => 'http://' . $ip . '/github/taskrbackend/login.php', //the url to go to after a successful login
-		        'state'=>$project_id
+		        'redirect_uri' => 'http://' . $ip . '/github/taskrbackend/login.php?pid='.$project_id //the url to go to after a successful login
+		       
 		    ));
 
 

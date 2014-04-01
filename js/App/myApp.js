@@ -366,7 +366,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             // console.log(Task_ID);
             if($scope.JsonData[i].Task_ID==Task_ID)
             {
-                console.log("FOUND tempIndex");
+                // console.log("FOUND tempIndex");
                 return i;
             }
                 
@@ -464,13 +464,13 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         arr=currProject.split("/");
         currProject=arr[0];
         currTask=arr[2];
-        console.log(currTask);
+        // console.log(currTask);
         // delimit at '/'
         if(currProject==='/' || currProject==='')
             currProject=$scope.UserInfo.User_ID;
         
         currProject=parseInt(currProject);
-        console.log(currProject);
+        // console.log(currProject);
         if(currProject==0)
         {
             //find the Project_ID of this task
@@ -480,7 +480,7 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
             currProject=$scope.JsonData[tempIndex].Task_Project_ID;
         }
 
-        console.log("Final Project : " + currProject);
+        // console.log("Final Project : " + currProject);
         for(var i=0;i<$scope.ListAllProjects.length;i++)
         {
             if(currProject==$scope.ListAllProjects[i].Project_ID)
@@ -726,6 +726,40 @@ myapp.controller('DataCtrl',function($scope,$http,$stateParams,$location,JSONDat
         return task.Task_assignedTo;
     }
 
+    $scope.initOftempAssignedTo=function(task)
+    {
+        var flag=0;
+        // console.log(task.Task_Project_ID);
+        // check projects array to find the name of the corresponding user_id number
+        $scope.ListAllProjects.forEach(function(value)
+        {
+
+            if(value.Project_ID==task.Task_Project_ID)
+            {
+                // console.log("Name of the project is :");
+                // console.log(value);
+                value.Project_Members.forEach(function(value2)
+                {
+                    // console.log("Name of the member is :");
+                    // console.log(value2.User_Name);
+                    if(task.Task_assignedTo==value2.User_ID)
+                    {
+                        console.log("Name of the member is :");
+                        console.log(value2.User_Name);
+                        flag=1;
+                        $scope.tempPrintingNameofAssignedTo=value2.User_Name;
+                        return value2.User_Name;    
+                    }
+                    
+                });
+            }
+                
+        });
+
+        if(flag==0)
+            $scope.tempPrintingNameofAssignedTo="no one";
+        
+    }
 
     $scope.addAssignedTo=function(task)
     {
